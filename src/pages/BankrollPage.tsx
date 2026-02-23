@@ -1,0 +1,65 @@
+import { useParams, useNavigate } from "react-router-dom";
+import { useBets } from "@/hooks/useBets";
+import { useBankrolls } from "@/hooks/useBankrolls";
+import { StatsCards } from "@/components/StatsCards";
+import { AddBetForm } from "@/components/AddBetForm";
+import { BetList } from "@/components/BetList";
+import { BankrollChart } from "@/components/BankrollChart";
+import { ArrowLeft, Wallet } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+const BankrollPage = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { getBankroll } = useBankrolls();
+  const bankroll = getBankroll(id || "");
+  const { bets, addBet, updateBet, deleteBet, stats } = useBets(id || "");
+
+  if (!bankroll) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <p className="text-muted-foreground text-lg">Bankroll not found.</p>
+          <Button variant="outline" onClick={() => navigate("/")}>Go Home</Button>
+        </div>
+      </div>
+    );
+  }
+
+  const currentBank = bankroll.initialAmount + stats.totalPnl;
+
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="border-b border-border">
+        <div className="container max-w-6xl mx-auto px-4 py-4 flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0">
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+            <Wallet className="w-5 h-5 text-primary" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-lg font-bold text-foreground tracking-tight truncate">{bankroll.name}</h1>
+            <p className="text-xs text-muted-foreground">
+              Started with ${bankroll.initialAmount.toFixed(2)} • Current: <span className={currentBank >= bankroll.initialAmount ? "text-win" : "text-loss"}>${currentBank.toFixed(2)}</span>
+            </p>
+          </div>
+        </div>
+      </header>
+
+      <main className="container max-w-6xl mx-auto px-4 py-6 space-y-6">
+        <StatsCards stats={stats} />
+        <BankrollChart bets={bets} initialBank={bankroll.initialAmount} />
+
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-foreground">Bets</h2>
+          <AddBetForm onAdd={addBet} />
+        </div>
+
+        <BetList bets={bets} onUpdate={updateBet} onDelete={deleteBet} />
+      </main>
+    </div>
+  );
+};
+
+export default BankrollPage;

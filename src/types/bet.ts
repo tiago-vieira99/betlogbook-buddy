@@ -8,3 +8,10 @@ export interface Bet {
   date: string;
   comment?: string;
 }
+
+export interface Bankroll {
+  id: string;
+  name: string;
+  initialAmount: number;
+  createdAt: string;
+}
