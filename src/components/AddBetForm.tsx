@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bet, BetResult, BetSport, SPORT_LABELS } from "@/types/bet";
+import { Bet, BetResult } from "@/types/bet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,33 +13,29 @@ interface AddBetFormProps {
 export function AddBetForm({ onAdd }: AddBetFormProps) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
-    event: "",
-    sport: "football" as BetSport,
-    pick: "",
     odds: "",
     stake: "",
     result: "pending" as BetResult,
     date: new Date().toISOString().split("T")[0],
-    notes: "",
+    comment: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.event || !form.pick || !form.odds || !form.stake) return;
+    if (!form.odds || !form.stake) return;
     onAdd({
-      ...form,
       odds: parseFloat(form.odds),
       stake: parseFloat(form.stake),
+      result: form.result,
+      date: form.date,
+      comment: form.comment || undefined,
     });
     setForm({
-      event: "",
-      sport: "football",
-      pick: "",
       odds: "",
       stake: "",
       result: "pending",
       date: new Date().toISOString().split("T")[0],
-      notes: "",
+      comment: "",
     });
     setOpen(false);
   };
@@ -60,30 +56,7 @@ export function AddBetForm({ onAdd }: AddBetFormProps) {
           <X className="w-4 h-4" />
         </Button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="space-y-2">
-          <Label>Event</Label>
-          <Input placeholder="e.g. Real Madrid vs Barcelona" value={form.event} onChange={(e) => setForm({ ...form, event: e.target.value })} />
-        </div>
-        <div className="space-y-2">
-          <Label>Sport</Label>
-          <Select value={form.sport} onValueChange={(v) => setForm({ ...form, sport: v as BetSport })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {Object.entries(SPORT_LABELS).map(([k, v]) => (
-                <SelectItem key={k} value={k}>{v}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="space-y-2">
-          <Label>Pick</Label>
-          <Input placeholder="e.g. Over 2.5 goals" value={form.pick} onChange={(e) => setForm({ ...form, pick: e.target.value })} />
-        </div>
-        <div className="space-y-2">
-          <Label>Date</Label>
-          <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <div className="space-y-2">
           <Label>Odds (decimal)</Label>
           <Input type="number" step="0.01" min="1" placeholder="e.g. 1.85" value={form.odds} onChange={(e) => setForm({ ...form, odds: e.target.value })} />
@@ -91,6 +64,10 @@ export function AddBetForm({ onAdd }: AddBetFormProps) {
         <div className="space-y-2">
           <Label>Stake ($)</Label>
           <Input type="number" step="0.01" min="0" placeholder="e.g. 50" value={form.stake} onChange={(e) => setForm({ ...form, stake: e.target.value })} />
+        </div>
+        <div className="space-y-2">
+          <Label>Date</Label>
+          <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
         </div>
         <div className="space-y-2">
           <Label>Result</Label>
@@ -103,9 +80,13 @@ export function AddBetForm({ onAdd }: AddBetFormProps) {
             </SelectContent>
           </Select>
         </div>
-        <div className="flex items-end">
-          <Button type="submit" className="w-full">Add Bet</Button>
+        <div className="space-y-2">
+          <Label>Comment <span className="text-muted-foreground">(optional)</span></Label>
+          <Input placeholder="e.g. Good value bet" value={form.comment} onChange={(e) => setForm({ ...form, comment: e.target.value })} />
         </div>
+      </div>
+      <div className="mt-4 flex justify-end">
+        <Button type="submit">Add Bet</Button>
       </div>
     </form>
   );

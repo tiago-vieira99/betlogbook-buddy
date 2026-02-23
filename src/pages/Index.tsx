@@ -2,6 +2,7 @@ import { useBets } from "@/hooks/useBets";
 import { StatsCards } from "@/components/StatsCards";
 import { AddBetForm } from "@/components/AddBetForm";
 import { BetList } from "@/components/BetList";
+import { BankrollChart } from "@/components/BankrollChart";
 import { BarChart3 } from "lucide-react";
 
 const Index = () => {
@@ -23,6 +24,7 @@ const Index = () => {
 
       <main className="container max-w-6xl mx-auto px-4 py-6 space-y-6">
         <StatsCards stats={stats} />
+        <BankrollChart bets={bets} />
 
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-foreground">Your Bets</h2>

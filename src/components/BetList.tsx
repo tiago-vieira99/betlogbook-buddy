@@ -1,4 +1,4 @@
-import { Bet, BetResult, SPORT_LABELS } from "@/types/bet";
+import { Bet, BetResult } from "@/types/bet";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Trash2 } from "lucide-react";
@@ -13,12 +13,6 @@ const resultStyles: Record<BetResult, string> = {
   win: "text-win bg-win/10 border-win/20",
   loss: "text-loss bg-loss/10 border-loss/20",
   pending: "text-pending bg-pending/10 border-pending/20",
-};
-
-const resultLabels: Record<BetResult, string> = {
-  win: "Win ✅",
-  loss: "Loss ❌",
-  pending: "Pending ⏳",
 };
 
 export function BetList({ bets, onUpdate, onDelete }: BetListProps) {
@@ -41,13 +35,8 @@ export function BetList({ bets, onUpdate, onDelete }: BetListProps) {
             style={{ animationDelay: `${i * 30}ms` }}
           >
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs text-muted-foreground">{SPORT_LABELS[bet.sport]}</span>
-                <span className="text-xs text-muted-foreground">•</span>
-                <span className="text-xs text-muted-foreground">{bet.date}</span>
-              </div>
-              <p className="font-medium text-foreground truncate">{bet.event}</p>
-              <p className="text-sm text-muted-foreground">{bet.pick}</p>
+              <p className="text-xs text-muted-foreground mb-1">{bet.date}</p>
+              {bet.comment && <p className="text-sm text-muted-foreground">{bet.comment}</p>}
             </div>
 
             <div className="flex items-center gap-4 text-sm font-mono">
