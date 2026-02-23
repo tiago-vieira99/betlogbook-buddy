@@ -1,17 +1,32 @@
-import { useBets } from "@/hooks/useBets";
-import { StatsCards } from "@/components/StatsCards";
-import { AddBetForm } from "@/components/AddBetForm";
-import { BetList } from "@/components/BetList";
-import { BankrollChart } from "@/components/BankrollChart";
-import { BarChart3 } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useBankrolls } from "@/hooks/useBankrolls";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { BarChart3, Plus, Trash2, ArrowRight, Wallet, X } from "lucide-react";
 
 const Index = () => {
-  const { bets, addBet, updateBet, deleteBet, stats } = useBets();
+  const { bankrolls, addBankroll, deleteBankroll } = useBankrolls();
+  const [showForm, setShowForm] = useState(false);
+  const [name, setName] = useState("");
+  const [amount, setAmount] = useState("");
+  const navigate = useNavigate();
+
+  const handleCreate = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim() || !amount) return;
+    const bankroll = addBankroll(name.trim(), parseFloat(amount));
+    setName("");
+    setAmount("");
+    setShowForm(false);
+    navigate(`/bankroll/${bankroll.id}`);
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border">
-        <div className="container max-w-6xl mx-auto px-4 py-4 flex items-center gap-3">
+        <div className="container max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
             <BarChart3 className="w-5 h-5 text-primary" />
           </div>
@@ -22,16 +37,102 @@ const Index = () => {
         </div>
       </header>
 
-      <main className="container max-w-6xl mx-auto px-4 py-6 space-y-6">
-        <StatsCards stats={stats} />
-        <BankrollChart bets={bets} />
-
+      <main className="container max-w-4xl mx-auto px-4 py-8 space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-foreground">Your Bets</h2>
-          <AddBetForm onAdd={addBet} />
+          <h2 className="text-xl font-semibold text-foreground">Your Bankrolls</h2>
+          {!showForm && (
+            <Button onClick={() => setShowForm(true)} className="gap-2">
+              <Plus className="w-4 h-4" /> New Bankroll
+            </Button>
+          )}
         </div>
 
-        <BetList bets={bets} onUpdate={updateBet} onDelete={deleteBet} />
+        {showForm && (
+          <form onSubmit={handleCreate} className="rounded-lg bg-card border border-border p-5 animate-fade-in">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-foreground">Create Bankroll</h3>
+              <Button type="button" variant="ghost" size="icon" onClick={() => setShowForm(false)}>
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label>Name</Label>
+                <Input placeholder="e.g. Football Strategy" value={name} onChange={(e) => setName(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>Initial Amount ($)</Label>
+                <Input type="number" step="0.01" min="0" placeholder="e.g. 500" value={amount} onChange={(e) => setAmount(e.target.value)} />
+              </div>
+              <div className="flex items-end">
+                <Button type="submit" className="w-full">Create</Button>
+              </div>
+            </div>
+          </form>
+        )}
+
+        {bankrolls.length === 0 && !showForm ? (
+          <div className="rounded-lg bg-card border border-border p-12 text-center animate-fade-in">
+            <Wallet className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+            <p className="text-muted-foreground text-lg">No bankrolls yet.</p>
+            <p className="text-sm text-muted-foreground">Create your first bankroll to start tracking bets!</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {bankrolls.map((br) => {
+              // Quick P&L calc from stored bets
+              const stored = localStorage.getItem(`bettracker_bets_${br.id}`);
+              const bets = stored ? JSON.parse(stored) : [];
+              const pnl = bets.reduce((sum: number, b: any) => {
+                if (b.result === "win") return sum + b.stake * (b.odds - 1);
+                if (b.result === "loss") return sum - b.stake;
+                return sum;
+              }, 0);
+              const currentBank = br.initialAmount + pnl;
+
+              return (
+                <div
+                  key={br.id}
+                  className="rounded-lg bg-card border border-border p-5 flex flex-col md:flex-row md:items-center gap-4 animate-fade-in hover:border-primary/30 transition-colors cursor-pointer group"
+                  onClick={() => navigate(`/bankroll/${br.id}`)}
+                >
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                    <Wallet className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-foreground">{br.name}</p>
+                    <p className="text-xs text-muted-foreground">{bets.length} bets • Created {br.createdAt}</p>
+                  </div>
+                  <div className="flex items-center gap-6 font-mono text-sm">
+                    <div className="text-center">
+                      <p className="text-xs text-muted-foreground">Initial</p>
+                      <p className="text-foreground">${br.initialAmount.toFixed(2)}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs text-muted-foreground">Current</p>
+                      <p className={currentBank >= br.initialAmount ? "text-win" : "text-loss"}>${currentBank.toFixed(2)}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs text-muted-foreground">P&L</p>
+                      <p className={pnl >= 0 ? "text-win" : "text-loss"}>{pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-muted-foreground hover:text-loss"
+                      onClick={(e) => { e.stopPropagation(); deleteBankroll(br.id); }}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                    <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </main>
     </div>
   );

@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
 import { Bet } from "@/types/bet";
 
-const STORAGE_KEY = "bettracker_bets";
+export function useBets(bankrollId: string) {
+  const storageKey = `bettracker_bets_${bankrollId}`;
 
-export function useBets() {
   const [bets, setBets] = useState<Bet[]>(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = localStorage.getItem(storageKey);
     return stored ? JSON.parse(stored) : [];
   });
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(bets));
-  }, [bets]);
+    localStorage.setItem(storageKey, JSON.stringify(bets));
+  }, [bets, storageKey]);
 
   const addBet = (bet: Omit<Bet, "id">) => {
     setBets((prev) => [{ ...bet, id: crypto.randomUUID() }, ...prev]);
