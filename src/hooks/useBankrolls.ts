@@ -24,9 +24,9 @@ export function useBankrolls() {
     loadBankrolls();
   }, [loadBankrolls]);
 
-  const addBankroll = async (name: string, initialAmount: number): Promise<Bankroll | null> => {
+  const addBankroll = async (name: string, initialValue: number): Promise<Bankroll | null> => {
     try {
-      const bankroll = await createBankroll(name, initialAmount);
+      const bankroll = await createBankroll(name, initialValue);
       setBankrolls((prev) => [bankroll, ...prev]);
       return bankroll;
     } catch (err) {
@@ -36,7 +36,7 @@ export function useBankrolls() {
     }
   };
 
-  const deleteBankroll = async (id: string) => {
+  const deleteBankroll = async (id: number) => {
     try {
       await deleteBankrollApi(id);
       setBankrolls((prev) => prev.filter((b) => b.id !== id));
@@ -46,7 +46,7 @@ export function useBankrolls() {
     }
   };
 
-  const getBankroll = (id: string) => bankrolls.find((b) => b.id === id);
+  const getBankroll = (id: number) => bankrolls.find((b) => b.id === id);
 
   return { bankrolls, addBankroll, deleteBankroll, getBankroll, loading };
 }

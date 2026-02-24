@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Bet, BetResult } from "@/types/bet";
+import { Bet, BetStatus } from "@/types/bet";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Trash2, ChevronDown } from "lucide-react";
@@ -7,18 +7,18 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 
 interface BetListProps {
   bets: Bet[];
-  onUpdate: (id: string, updates: Partial<Bet>) => void;
-  onDelete: (id: string) => void;
+  onUpdate: (id: number, updates: Partial<Bet>) => void;
+  onDelete: (id: number) => void;
 }
 
-const resultStyles: Record<BetResult, string> = {
-  win: "text-win bg-win/10 border-win/20",
-  loss: "text-loss bg-loss/10 border-loss/20",
-  pending: "text-pending bg-pending/10 border-pending/20",
+const statusStyles: Record<BetStatus, string> = {
+  WON: "text-win bg-win/10 border-win/20",
+  LOST: "text-loss bg-loss/10 border-loss/20",
+  PENDING: "text-pending bg-pending/10 border-pending/20",
 };
 
 function BetRow({ bet, onUpdate, onDelete }: { bet: Bet; onUpdate: BetListProps["onUpdate"]; onDelete: BetListProps["onDelete"] }) {
-  const pnl = bet.result === "win" ? bet.stake * (bet.odds - 1) : bet.result === "loss" ? -bet.stake : 0;
+  const pnl = bet.status === "WON" ? bet.stake * (bet.odd - 1) : bet.status === "LOST" ? -bet.stake : 0;
 
   return (
     <div className="rounded-lg bg-secondary/50 border border-border p-4 flex flex-col md:flex-row md:items-center gap-3">
@@ -29,8 +29,8 @@ function BetRow({ bet, onUpdate, onDelete }: { bet: Bet; onUpdate: BetListProps[
 
       <div className="flex items-center gap-4 text-sm font-mono">
         <div className="text-center">
-          <p className="text-xs text-muted-foreground">Odds</p>
-          <p className="text-foreground">{bet.odds.toFixed(2)}</p>
+          <p className="text-xs text-muted-foreground">Odd</p>
+          <p className="text-foreground">{bet.odd.toFixed(2)}</p>
         </div>
         <div className="text-center">
           <p className="text-xs text-muted-foreground">Stake</p>
@@ -38,21 +38,21 @@ function BetRow({ bet, onUpdate, onDelete }: { bet: Bet; onUpdate: BetListProps[
         </div>
         <div className="text-center">
           <p className="text-xs text-muted-foreground">P&L</p>
-          <p className={pnl >= 0 && bet.result !== "pending" ? "text-win" : pnl < 0 ? "text-loss" : "text-muted-foreground"}>
-            {bet.result === "pending" ? "—" : `${pnl >= 0 ? "+" : ""}$${pnl.toFixed(2)}`}
+          <p className={pnl >= 0 && bet.status !== "PENDING" ? "text-win" : pnl < 0 ? "text-loss" : "text-muted-foreground"}>
+            {bet.status === "PENDING" ? "—" : `${pnl >= 0 ? "+" : ""}$${pnl.toFixed(2)}`}
           </p>
         </div>
       </div>
 
       <div className="flex items-center gap-2">
-        <Select value={bet.result} onValueChange={(v) => onUpdate(bet.id, { result: v as BetResult })}>
-          <SelectTrigger className={`w-32 text-xs border ${resultStyles[bet.result]}`}>
+        <Select value={bet.status} onValueChange={(v) => onUpdate(bet.id, { status: v as BetStatus })}>
+          <SelectTrigger className={`w-32 text-xs border ${statusStyles[bet.status]}`}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="bg-popover border-border z-50">
-            <SelectItem value="pending">⏳ Pending</SelectItem>
-            <SelectItem value="win">✅ Win</SelectItem>
-            <SelectItem value="loss">❌ Loss</SelectItem>
+            <SelectItem value="PENDING">⏳ Pending</SelectItem>
+            <SelectItem value="WON">✅ Won</SelectItem>
+            <SelectItem value="LOST">❌ Lost</SelectItem>
           </SelectContent>
         </Select>
         <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-loss" onClick={() => onDelete(bet.id)}>
@@ -66,10 +66,15 @@ function BetRow({ bet, onUpdate, onDelete }: { bet: Bet; onUpdate: BetListProps[
 export function BetList({ bets, onUpdate, onDelete }: BetListProps) {
   const grouped = useMemo(() => {
     const groups: Record<string, Bet[]> = {};
-    const sorted = [...bets].sort((a, b) => b.date.localeCompare(a.date));
+    // Date format is DD/MM/YYYY — parse and sort descending
+    const sorted = [...bets].sort((a, b) => {
+      const [da, ma, ya] = a.date.split("/");
+      const [db, mb, yb] = b.date.split("/");
+      return `${yb}-${mb}-${db}`.localeCompare(`${ya}-${ma}-${da}`);
+    });
 
     for (const bet of sorted) {
-      const [year, month] = bet.date.split("-");
+      const [, month, year] = bet.date.split("/");
       const key = `${year}-${month}`;
       if (!groups[key]) groups[key] = [];
       groups[key].push(bet);
@@ -81,8 +86,8 @@ export function BetList({ bets, onUpdate, onDelete }: BetListProps) {
         const [year, month] = key.split("-");
         const label = new Date(parseInt(year), parseInt(month) - 1).toLocaleString("default", { month: "long", year: "numeric" });
         const pnl = monthBets.reduce((sum, b) => {
-          if (b.result === "win") return sum + b.stake * (b.odds - 1);
-          if (b.result === "loss") return sum - b.stake;
+          if (b.status === "WON") return sum + b.stake * (b.odd - 1);
+          if (b.status === "LOST") return sum - b.stake;
           return sum;
         }, 0);
         return { key, label, bets: monthBets, pnl };

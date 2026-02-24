@@ -80,54 +80,46 @@ const Index = () => {
           </div>
         ) : (
           <div className="space-y-3">
-            {bankrolls.map((br) => {
-              // TODO: To show P&L on the index page, you may want your API
-              // to return summary stats with each bankroll, or fetch bets here.
-              // For now, showing initial amount only.
-              const pnl = 0;
-              const currentBank = br.initialAmount + pnl;
-
-              return (
-                <div
-                  key={br.id}
-                  className="rounded-lg bg-card border border-border p-5 flex flex-col md:flex-row md:items-center gap-4 animate-fade-in hover:border-primary/30 transition-colors cursor-pointer group"
-                  onClick={() => navigate(`/bankroll/${br.id}`)}
-                >
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                    <Wallet className="w-5 h-5 text-primary" />
+            {bankrolls.map((br) => (
+              <div
+                key={br.id}
+                className="rounded-lg bg-card border border-border p-5 flex flex-col md:flex-row md:items-center gap-4 animate-fade-in hover:border-primary/30 transition-colors cursor-pointer group"
+                onClick={() => navigate(`/bankroll/${br.id}`)}
+              >
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                  <Wallet className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-foreground">{br.name}</p>
+                  {br.description && <p className="text-xs text-muted-foreground">{br.description}</p>}
+                </div>
+                <div className="flex items-center gap-6 font-mono text-sm">
+                  <div className="text-center">
+                    <p className="text-xs text-muted-foreground">Initial</p>
+                    <p className="text-foreground">${br.initialValue.toFixed(2)}</p>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-foreground">{br.name}</p>
-                    <p className="text-xs text-muted-foreground">Created {br.createdAt}</p>
+                  <div className="text-center">
+                    <p className="text-xs text-muted-foreground">Balance</p>
+                    <p className={br.balance >= 0 ? "text-win" : "text-loss"}>${(br.initialValue + br.balance).toFixed(2)}</p>
                   </div>
-                  <div className="flex items-center gap-6 font-mono text-sm">
-                    <div className="text-center">
-                      <p className="text-xs text-muted-foreground">Initial</p>
-                      <p className="text-foreground">${br.initialAmount.toFixed(2)}</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-xs text-muted-foreground">Current</p>
-                      <p className={currentBank >= br.initialAmount ? "text-win" : "text-loss"}>${currentBank.toFixed(2)}</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-xs text-muted-foreground">P&L</p>
-                      <p className={pnl >= 0 ? "text-win" : "text-loss"}>{pnl >= 0 ? "+" : ""}${pnl.toFixed(2)}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-muted-foreground hover:text-loss"
-                      onClick={(e) => { e.stopPropagation(); deleteBankroll(br.id); }}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                    <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                  <div className="text-center">
+                    <p className="text-xs text-muted-foreground">P&L</p>
+                    <p className={br.balance >= 0 ? "text-win" : "text-loss"}>{br.balance >= 0 ? "+" : ""}${br.balance.toFixed(2)}</p>
                   </div>
                 </div>
-              );
-            })}
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground hover:text-loss"
+                    onClick={(e) => { e.stopPropagation(); deleteBankroll(br.id); }}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </main>

@@ -8,21 +8,28 @@ interface BankrollChartProps {
   initialBank?: number;
 }
 
+// Parse DD/MM/YYYY to sortable YYYY-MM-DD
+function parseDateToISO(dateStr: string): string {
+  const [d, m, y] = dateStr.split("/");
+  return `${y}-${m}-${d}`;
+}
+
 export function BankrollChart({ bets, initialBank = 0 }: BankrollChartProps) {
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
 
   const availableMonths = useMemo(() => {
     const months = new Set<string>();
-    bets.filter((b) => b.result !== "pending").forEach((b) => {
-      months.add(b.date.slice(0, 7));
+    bets.filter((b) => b.status !== "PENDING").forEach((b) => {
+      const iso = parseDateToISO(b.date);
+      months.add(iso.slice(0, 7));
     });
     return Array.from(months).sort();
   }, [bets]);
 
   const data = useMemo(() => {
     const settled = bets
-      .filter((b) => b.result !== "pending")
-      .sort((a, b) => a.date.localeCompare(b.date));
+      .filter((b) => b.status !== "PENDING")
+      .sort((a, b) => parseDateToISO(a.date).localeCompare(parseDateToISO(b.date)));
 
     if (settled.length === 0) return [];
 
@@ -30,28 +37,28 @@ export function BankrollChart({ bets, initialBank = 0 }: BankrollChartProps) {
       let bank = initialBank;
       const points: { date: string; bank: number }[] = [{ date: "Start", bank }];
       for (const bet of settled) {
-        if (bet.result === "win") bank += bet.stake * (bet.odds - 1);
+        if (bet.status === "WON") bank += bet.stake * (bet.odd - 1);
         else bank -= bet.stake;
         points.push({ date: bet.date, bank: parseFloat(bank.toFixed(2)) });
       }
       return points;
     }
 
-    // For a specific month, calculate the bank at the start of that month
     let bankAtMonthStart = initialBank;
     for (const bet of settled) {
-      if (bet.date.slice(0, 7) >= selectedMonth) break;
-      if (bet.result === "win") bankAtMonthStart += bet.stake * (bet.odds - 1);
+      const iso = parseDateToISO(bet.date);
+      if (iso.slice(0, 7) >= selectedMonth) break;
+      if (bet.status === "WON") bankAtMonthStart += bet.stake * (bet.odd - 1);
       else bankAtMonthStart -= bet.stake;
     }
 
-    const monthBets = settled.filter((b) => b.date.slice(0, 7) === selectedMonth);
+    const monthBets = settled.filter((b) => parseDateToISO(b.date).slice(0, 7) === selectedMonth);
     if (monthBets.length === 0) return [];
 
     let bank = bankAtMonthStart;
     const points: { date: string; bank: number }[] = [{ date: "Start", bank: parseFloat(bank.toFixed(2)) }];
     for (const bet of monthBets) {
-      if (bet.result === "win") bank += bet.stake * (bet.odds - 1);
+      if (bet.status === "WON") bank += bet.stake * (bet.odd - 1);
       else bank -= bet.stake;
       points.push({ date: bet.date, bank: parseFloat(bank.toFixed(2)) });
     }
