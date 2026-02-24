@@ -1,6 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Bet } from "@/types/bet";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface BankrollChartProps {
   bets: Bet[];
@@ -8,27 +9,54 @@ interface BankrollChartProps {
 }
 
 export function BankrollChart({ bets, initialBank = 0 }: BankrollChartProps) {
+  const [selectedMonth, setSelectedMonth] = useState<string>("all");
+
+  const availableMonths = useMemo(() => {
+    const months = new Set<string>();
+    bets.filter((b) => b.result !== "pending").forEach((b) => {
+      months.add(b.date.slice(0, 7));
+    });
+    return Array.from(months).sort();
+  }, [bets]);
+
   const data = useMemo(() => {
     const settled = bets
       .filter((b) => b.result !== "pending")
-      .sort((a, b) => a.date.localeCompare(b.date) || 0);
+      .sort((a, b) => a.date.localeCompare(b.date));
 
     if (settled.length === 0) return [];
 
-    let bank = initialBank;
-    const points: { date: string; bank: number }[] = [{ date: "Start", bank }];
-
-    for (const bet of settled) {
-      if (bet.result === "win") {
-        bank += bet.stake * (bet.odds - 1);
-      } else {
-        bank -= bet.stake;
+    if (selectedMonth === "all") {
+      let bank = initialBank;
+      const points: { date: string; bank: number }[] = [{ date: "Start", bank }];
+      for (const bet of settled) {
+        if (bet.result === "win") bank += bet.stake * (bet.odds - 1);
+        else bank -= bet.stake;
+        points.push({ date: bet.date, bank: parseFloat(bank.toFixed(2)) });
       }
-      points.push({ date: bet.date, bank: parseFloat(bank.toFixed(2)) });
+      return points;
     }
 
+    // For a specific month, calculate the bank at the start of that month
+    let bankAtMonthStart = initialBank;
+    for (const bet of settled) {
+      if (bet.date.slice(0, 7) >= selectedMonth) break;
+      if (bet.result === "win") bankAtMonthStart += bet.stake * (bet.odds - 1);
+      else bankAtMonthStart -= bet.stake;
+    }
+
+    const monthBets = settled.filter((b) => b.date.slice(0, 7) === selectedMonth);
+    if (monthBets.length === 0) return [];
+
+    let bank = bankAtMonthStart;
+    const points: { date: string; bank: number }[] = [{ date: "Start", bank: parseFloat(bank.toFixed(2)) }];
+    for (const bet of monthBets) {
+      if (bet.result === "win") bank += bet.stake * (bet.odds - 1);
+      else bank -= bet.stake;
+      points.push({ date: bet.date, bank: parseFloat(bank.toFixed(2)) });
+    }
     return points;
-  }, [bets, initialBank]);
+  }, [bets, initialBank, selectedMonth]);
 
   if (data.length < 2) {
     return (
@@ -44,7 +72,24 @@ export function BankrollChart({ bets, initialBank = 0 }: BankrollChartProps) {
 
   return (
     <div className="rounded-lg bg-card border border-border p-5 animate-fade-in">
-      <h3 className="font-semibold text-foreground mb-4">Bankroll Evolution</h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-semibold text-foreground">Bankroll Evolution</h3>
+        {availableMonths.length > 1 && (
+          <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+            <SelectTrigger className="w-[160px] h-8 text-xs">
+              <SelectValue placeholder="All time" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All time</SelectItem>
+              {availableMonths.map((m) => (
+                <SelectItem key={m} value={m}>
+                  {new Date(m + "-01").toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      </div>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
