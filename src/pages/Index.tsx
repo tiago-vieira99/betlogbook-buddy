@@ -13,10 +13,11 @@ const Index = () => {
   const [amount, setAmount] = useState("");
   const navigate = useNavigate();
 
-  const handleCreate = (e: React.FormEvent) => {
+  const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !amount) return;
-    const bankroll = addBankroll(name.trim(), parseFloat(amount));
+    const bankroll = await addBankroll(name.trim(), parseFloat(amount));
+    if (!bankroll) return;
     setName("");
     setAmount("");
     setShowForm(false);
@@ -80,14 +81,10 @@ const Index = () => {
         ) : (
           <div className="space-y-3">
             {bankrolls.map((br) => {
-              // Quick P&L calc from stored bets
-              const stored = localStorage.getItem(`bettracker_bets_${br.id}`);
-              const bets = stored ? JSON.parse(stored) : [];
-              const pnl = bets.reduce((sum: number, b: any) => {
-                if (b.result === "win") return sum + b.stake * (b.odds - 1);
-                if (b.result === "loss") return sum - b.stake;
-                return sum;
-              }, 0);
+              // TODO: To show P&L on the index page, you may want your API
+              // to return summary stats with each bankroll, or fetch bets here.
+              // For now, showing initial amount only.
+              const pnl = 0;
               const currentBank = br.initialAmount + pnl;
 
               return (
@@ -101,7 +98,7 @@ const Index = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-foreground">{br.name}</p>
-                    <p className="text-xs text-muted-foreground">{bets.length} bets • Created {br.createdAt}</p>
+                    <p className="text-xs text-muted-foreground">Created {br.createdAt}</p>
                   </div>
                   <div className="flex items-center gap-6 font-mono text-sm">
                     <div className="text-center">

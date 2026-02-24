@@ -1,28 +1,58 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Bet } from "@/types/bet";
+import { fetchBets, createBet, updateBetApi, deleteBetApi } from "@/services/api";
+import { toast } from "sonner";
 
 export function useBets(bankrollId: string) {
-  const storageKey = `bettracker_bets_${bankrollId}`;
+  const [bets, setBets] = useState<Bet[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [bets, setBets] = useState<Bet[]>(() => {
-    const stored = localStorage.getItem(storageKey);
-    return stored ? JSON.parse(stored) : [];
-  });
+  const loadBets = useCallback(async () => {
+    if (!bankrollId) return;
+    try {
+      setLoading(true);
+      const data = await fetchBets(bankrollId);
+      setBets(data);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load bets");
+    } finally {
+      setLoading(false);
+    }
+  }, [bankrollId]);
 
   useEffect(() => {
-    localStorage.setItem(storageKey, JSON.stringify(bets));
-  }, [bets, storageKey]);
+    loadBets();
+  }, [loadBets]);
 
-  const addBet = (bet: Omit<Bet, "id">) => {
-    setBets((prev) => [{ ...bet, id: crypto.randomUUID() }, ...prev]);
+  const addBet = async (bet: Omit<Bet, "id">) => {
+    try {
+      const created = await createBet(bankrollId, bet);
+      setBets((prev) => [created, ...prev]);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to add bet");
+    }
   };
 
-  const updateBet = (id: string, updates: Partial<Bet>) => {
-    setBets((prev) => prev.map((b) => (b.id === id ? { ...b, ...updates } : b)));
+  const updateBet = async (id: string, updates: Partial<Bet>) => {
+    try {
+      const updated = await updateBetApi(bankrollId, id, updates);
+      setBets((prev) => prev.map((b) => (b.id === id ? { ...b, ...updated } : b)));
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update bet");
+    }
   };
 
-  const deleteBet = (id: string) => {
-    setBets((prev) => prev.filter((b) => b.id !== id));
+  const deleteBet = async (id: string) => {
+    try {
+      await deleteBetApi(bankrollId, id);
+      setBets((prev) => prev.filter((b) => b.id !== id));
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete bet");
+    }
   };
 
   const stats = {
@@ -41,5 +71,5 @@ export function useBets(bankrollId: string) {
       : 0,
   };
 
-  return { bets, addBet, updateBet, deleteBet, stats };
+  return { bets, addBet, updateBet, deleteBet, stats, loading };
 }
