@@ -20,7 +20,9 @@ export function useBankrolls() {
       initialAmount,
       createdAt: new Date().toISOString().split("T")[0],
     };
-    setBankrolls((prev) => [bankroll, ...prev]);
+    const updated = [bankroll, ...bankrolls];
+    setBankrolls(updated);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     return bankroll;
   };
 
