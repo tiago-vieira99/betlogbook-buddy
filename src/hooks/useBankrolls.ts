@@ -1,37 +1,52 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Bankroll } from "@/types/bet";
-
-const STORAGE_KEY = "bettracker_bankrolls";
+import { fetchBankrolls, createBankroll, deleteBankrollApi } from "@/services/api";
+import { toast } from "sonner";
 
 export function useBankrolls() {
-  const [bankrolls, setBankrolls] = useState<Bankroll[]>(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
-  });
+  const [bankrolls, setBankrolls] = useState<Bankroll[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadBankrolls = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await fetchBankrolls();
+      setBankrolls(data);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load bankrolls");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(bankrolls));
-  }, [bankrolls]);
+    loadBankrolls();
+  }, [loadBankrolls]);
 
-  const addBankroll = (name: string, initialAmount: number) => {
-    const bankroll: Bankroll = {
-      id: crypto.randomUUID(),
-      name,
-      initialAmount,
-      createdAt: new Date().toISOString().split("T")[0],
-    };
-    const updated = [bankroll, ...bankrolls];
-    setBankrolls(updated);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    return bankroll;
+  const addBankroll = async (name: string, initialAmount: number): Promise<Bankroll | null> => {
+    try {
+      const bankroll = await createBankroll(name, initialAmount);
+      setBankrolls((prev) => [bankroll, ...prev]);
+      return bankroll;
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to create bankroll");
+      return null;
+    }
   };
 
-  const deleteBankroll = (id: string) => {
-    setBankrolls((prev) => prev.filter((b) => b.id !== id));
-    localStorage.removeItem(`bettracker_bets_${id}`);
+  const deleteBankroll = async (id: string) => {
+    try {
+      await deleteBankrollApi(id);
+      setBankrolls((prev) => prev.filter((b) => b.id !== id));
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete bankroll");
+    }
   };
 
   const getBankroll = (id: string) => bankrolls.find((b) => b.id === id);
 
-  return { bankrolls, addBankroll, deleteBankroll, getBankroll };
+  return { bankrolls, addBankroll, deleteBankroll, getBankroll, loading };
 }
