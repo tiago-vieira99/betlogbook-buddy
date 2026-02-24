@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Bet, BetResult } from "@/types/bet";
+import { Bet, BetStatus } from "@/types/bet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,29 +12,34 @@ interface AddBetFormProps {
 
 export function AddBetForm({ onAdd }: AddBetFormProps) {
   const [open, setOpen] = useState(false);
+  const today = new Date();
+  const todayStr = `${String(today.getDate()).padStart(2, "0")}/${String(today.getMonth() + 1).padStart(2, "0")}/${today.getFullYear()}`;
+
   const [form, setForm] = useState({
-    odds: "",
+    odd: "",
     stake: "",
-    result: "pending" as BetResult,
-    date: new Date().toISOString().split("T")[0],
+    status: "PENDING" as BetStatus,
+    date: todayStr,
     comment: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.odds || !form.stake) return;
+    if (!form.odd || !form.stake) return;
     onAdd({
-      odds: parseFloat(form.odds),
+      bankrollID: 0, // Will be set by the hook/API
+      odd: parseFloat(form.odd),
       stake: parseFloat(form.stake),
-      result: form.result,
+      balance: 0, // Calculated by the API
+      status: form.status,
       date: form.date,
-      comment: form.comment || undefined,
+      comment: form.comment || "",
     });
     setForm({
-      odds: "",
+      odd: "",
       stake: "",
-      result: "pending",
-      date: new Date().toISOString().split("T")[0],
+      status: "PENDING",
+      date: todayStr,
       comment: "",
     });
     setOpen(false);
@@ -58,25 +63,25 @@ export function AddBetForm({ onAdd }: AddBetFormProps) {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <div className="space-y-2">
-          <Label>Odds (decimal)</Label>
-          <Input type="number" step="0.01" min="1" placeholder="e.g. 1.85" value={form.odds} onChange={(e) => setForm({ ...form, odds: e.target.value })} />
+          <Label>Odd (decimal)</Label>
+          <Input type="number" step="0.01" min="1" placeholder="e.g. 1.85" value={form.odd} onChange={(e) => setForm({ ...form, odd: e.target.value })} />
         </div>
         <div className="space-y-2">
           <Label>Stake ($)</Label>
           <Input type="number" step="0.01" min="0" placeholder="e.g. 50" value={form.stake} onChange={(e) => setForm({ ...form, stake: e.target.value })} />
         </div>
         <div className="space-y-2">
-          <Label>Date</Label>
-          <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+          <Label>Date (DD/MM/YYYY)</Label>
+          <Input placeholder="e.g. 01/10/2022" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
         </div>
         <div className="space-y-2">
-          <Label>Result</Label>
-          <Select value={form.result} onValueChange={(v) => setForm({ ...form, result: v as BetResult })}>
+          <Label>Status</Label>
+          <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v as BetStatus })}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="pending">⏳ Pending</SelectItem>
-              <SelectItem value="win">✅ Win</SelectItem>
-              <SelectItem value="loss">❌ Loss</SelectItem>
+              <SelectItem value="PENDING">⏳ Pending</SelectItem>
+              <SelectItem value="WON">✅ Won</SelectItem>
+              <SelectItem value="LOST">❌ Lost</SelectItem>
             </SelectContent>
           </Select>
         </div>

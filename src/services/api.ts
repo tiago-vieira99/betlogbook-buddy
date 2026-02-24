@@ -15,47 +15,43 @@ function getHeaders(): HeadersInit {
 }
 
 // ============================================================
-// 📦 BANKROLL ENDPOINTS — Edit paths to match your API routes
+// 📦 BANKROLL ENDPOINTS
 // ============================================================
 
 export async function fetchBankrolls(): Promise<Bankroll[]> {
   const res = await fetch(`${API_BASE_URL}/bankrolls`, {
-    // <-- EDIT PATH
     method: "GET",
     headers: getHeaders(),
   });
   if (!res.ok) throw new Error("Failed to fetch bankrolls");
-  return res.json(); // <-- Adjust if your API wraps data, e.g. return (await res.json()).data
+  return res.json();
 }
 
-export async function fetchBankroll(id: string): Promise<Bankroll | null> {
+export async function fetchBankroll(id: number): Promise<Bankroll | null> {
   const res = await fetch(`${API_BASE_URL}/bankrolls/${id}`, {
-    // <-- EDIT PATH
     method: "GET",
     headers: getHeaders(),
   });
   if (res.status === 404) return null;
   if (!res.ok) throw new Error("Failed to fetch bankroll");
-  return res.json(); // <-- Adjust if needed
+  return res.json();
 }
 
 export async function createBankroll(
   name: string,
-  initialAmount: number
+  initialValue: number
 ): Promise<Bankroll> {
   const res = await fetch(`${API_BASE_URL}/bankrolls`, {
-    // <-- EDIT PATH
     method: "POST",
     headers: getHeaders(),
-    body: JSON.stringify({ name, initialAmount }), // <-- Adjust field names to match your API
+    body: JSON.stringify({ name, initialValue }),
   });
   if (!res.ok) throw new Error("Failed to create bankroll");
-  return res.json(); // <-- Should return the created Bankroll object with id, name, initialAmount, createdAt
+  return res.json();
 }
 
-export async function deleteBankrollApi(id: string): Promise<void> {
+export async function deleteBankrollApi(id: number): Promise<void> {
   const res = await fetch(`${API_BASE_URL}/bankrolls/${id}`, {
-    // <-- EDIT PATH
     method: "DELETE",
     headers: getHeaders(),
   });
@@ -63,46 +59,40 @@ export async function deleteBankrollApi(id: string): Promise<void> {
 }
 
 // ============================================================
-// 🎲 BET ENDPOINTS — Edit paths to match your API routes
+// 🎲 BET ENDPOINTS
 // ============================================================
 
-export async function fetchBets(bankrollId: string): Promise<Bet[]> {
-  const res = await fetch(
-    `${API_BASE_URL}/bankrolls/${bankrollId}/bets`, // <-- EDIT PATH
-    {
-      method: "GET",
-      headers: getHeaders(),
-    }
-  );
+export async function fetchBets(bankrollId: number): Promise<Bet[]> {
+  const res = await fetch(`${API_BASE_URL}/bankrolls/${bankrollId}/bets`, {
+    method: "GET",
+    headers: getHeaders(),
+  });
   if (!res.ok) throw new Error("Failed to fetch bets");
-  return res.json(); // <-- Adjust if your API wraps data
+  return res.json();
 }
 
 export async function createBet(
-  bankrollId: string,
+  bankrollId: number,
   bet: Omit<Bet, "id">
 ): Promise<Bet> {
-  const res = await fetch(
-    `${API_BASE_URL}/bankrolls/${bankrollId}/bets`, // <-- EDIT PATH
-    {
-      method: "POST",
-      headers: getHeaders(),
-      body: JSON.stringify(bet), // <-- Adjust field names if needed (odds, stake, result, date, comment)
-    }
-  );
+  const res = await fetch(`${API_BASE_URL}/bankrolls/${bankrollId}/bets`, {
+    method: "POST",
+    headers: getHeaders(),
+    body: JSON.stringify(bet),
+  });
   if (!res.ok) throw new Error("Failed to create bet");
-  return res.json(); // <-- Should return the created Bet object with id
+  return res.json();
 }
 
 export async function updateBetApi(
-  bankrollId: string,
-  betId: string,
+  bankrollId: number,
+  betId: number,
   updates: Partial<Bet>
 ): Promise<Bet> {
   const res = await fetch(
-    `${API_BASE_URL}/bankrolls/${bankrollId}/bets/${betId}`, // <-- EDIT PATH
+    `${API_BASE_URL}/bankrolls/${bankrollId}/bets/${betId}`,
     {
-      method: "PATCH", // <-- Change to PUT if your API uses PUT
+      method: "PATCH",
       headers: getHeaders(),
       body: JSON.stringify(updates),
     }
@@ -112,11 +102,11 @@ export async function updateBetApi(
 }
 
 export async function deleteBetApi(
-  bankrollId: string,
-  betId: string
+  bankrollId: number,
+  betId: number
 ): Promise<void> {
   const res = await fetch(
-    `${API_BASE_URL}/bankrolls/${bankrollId}/bets/${betId}`, // <-- EDIT PATH
+    `${API_BASE_URL}/bankrolls/${bankrollId}/bets/${betId}`,
     {
       method: "DELETE",
       headers: getHeaders(),

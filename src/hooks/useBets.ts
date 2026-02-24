@@ -3,7 +3,7 @@ import { Bet } from "@/types/bet";
 import { fetchBets, createBet, updateBetApi, deleteBetApi } from "@/services/api";
 import { toast } from "sonner";
 
-export function useBets(bankrollId: string) {
+export function useBets(bankrollId: number) {
   const [bets, setBets] = useState<Bet[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -35,7 +35,7 @@ export function useBets(bankrollId: string) {
     }
   };
 
-  const updateBet = async (id: string, updates: Partial<Bet>) => {
+  const updateBet = async (id: number, updates: Partial<Bet>) => {
     try {
       const updated = await updateBetApi(bankrollId, id, updates);
       setBets((prev) => prev.map((b) => (b.id === id ? { ...b, ...updated } : b)));
@@ -45,7 +45,7 @@ export function useBets(bankrollId: string) {
     }
   };
 
-  const deleteBet = async (id: string) => {
+  const deleteBet = async (id: number) => {
     try {
       await deleteBetApi(bankrollId, id);
       setBets((prev) => prev.filter((b) => b.id !== id));
@@ -57,17 +57,17 @@ export function useBets(bankrollId: string) {
 
   const stats = {
     total: bets.length,
-    wins: bets.filter((b) => b.result === "win").length,
-    losses: bets.filter((b) => b.result === "loss").length,
-    pending: bets.filter((b) => b.result === "pending").length,
+    wins: bets.filter((b) => b.status === "WON").length,
+    losses: bets.filter((b) => b.status === "LOST").length,
+    pending: bets.filter((b) => b.status === "PENDING").length,
     totalStaked: bets.reduce((sum, b) => sum + b.stake, 0),
     totalPnl: bets.reduce((sum, b) => {
-      if (b.result === "win") return sum + b.stake * (b.odds - 1);
-      if (b.result === "loss") return sum - b.stake;
+      if (b.status === "WON") return sum + b.stake * (b.odd - 1);
+      if (b.status === "LOST") return sum - b.stake;
       return sum;
     }, 0),
-    winRate: bets.filter((b) => b.result !== "pending").length > 0
-      ? (bets.filter((b) => b.result === "win").length / bets.filter((b) => b.result !== "pending").length) * 100
+    winRate: bets.filter((b) => b.status !== "PENDING").length > 0
+      ? (bets.filter((b) => b.status === "WON").length / bets.filter((b) => b.status !== "PENDING").length) * 100
       : 0,
   };
 

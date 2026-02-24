@@ -11,9 +11,10 @@ import { Button } from "@/components/ui/button";
 const BankrollPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const bankrollId = parseInt(id || "0", 10);
   const { getBankroll } = useBankrolls();
-  const bankroll = getBankroll(id || "");
-  const { bets, addBet, updateBet, deleteBet, stats } = useBets(id || "");
+  const bankroll = getBankroll(bankrollId);
+  const { bets, addBet, updateBet, deleteBet, stats } = useBets(bankrollId);
 
   if (!bankroll) {
     return (
@@ -26,7 +27,7 @@ const BankrollPage = () => {
     );
   }
 
-  const currentBank = bankroll.initialAmount + stats.totalPnl;
+  const currentBank = bankroll.initialValue + bankroll.balance;
 
   return (
     <div className="min-h-screen bg-background">
@@ -41,7 +42,7 @@ const BankrollPage = () => {
           <div className="flex-1 min-w-0">
             <h1 className="text-lg font-bold text-foreground tracking-tight truncate">{bankroll.name}</h1>
             <p className="text-xs text-muted-foreground">
-              Started with ${bankroll.initialAmount.toFixed(2)} • Current: <span className={currentBank >= bankroll.initialAmount ? "text-win" : "text-loss"}>${currentBank.toFixed(2)}</span>
+              Started with ${bankroll.initialValue.toFixed(2)} • Current: <span className={currentBank >= bankroll.initialValue ? "text-win" : "text-loss"}>${currentBank.toFixed(2)}</span>
             </p>
           </div>
         </div>
@@ -49,7 +50,7 @@ const BankrollPage = () => {
 
       <main className="container max-w-6xl mx-auto px-4 py-6 space-y-6">
         <StatsCards stats={stats} />
-        <BankrollChart bets={bets} initialBank={bankroll.initialAmount} />
+        <BankrollChart bets={bets} initialBank={bankroll.initialValue} />
 
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-foreground">Bets</h2>
