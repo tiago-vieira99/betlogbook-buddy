@@ -19,7 +19,7 @@ export function BankrollChart({ bets, initialBank = 0 }: BankrollChartProps) {
 
   const availableMonths = useMemo(() => {
     const months = new Set<string>();
-    bets.filter((b) => b.status !== "PENDING").forEach((b) => {
+    bets.filter((b) => b.status !== "ONGOING").forEach((b) => {
       const iso = parseDateToISO(b.date);
       months.add(iso.slice(0, 7));
     });
@@ -28,7 +28,7 @@ export function BankrollChart({ bets, initialBank = 0 }: BankrollChartProps) {
 
   const data = useMemo(() => {
     const settled = bets
-      .filter((b) => b.status !== "PENDING")
+      .filter((b) => b.status !== "ONGOING")
       .sort((a, b) => parseDateToISO(a.date).localeCompare(parseDateToISO(b.date)));
 
     if (settled.length === 0) return [];
@@ -108,7 +108,7 @@ export function BankrollChart({ bets, initialBank = 0 }: BankrollChartProps) {
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 14%, 18%)" />
             <XAxis dataKey="date" tick={{ fill: "hsl(215, 12%, 50%)", fontSize: 11 }} tickLine={false} axisLine={false} />
-            <YAxis tick={{ fill: "hsl(215, 12%, 50%)", fontSize: 11 }} tickLine={false} axisLine={false} domain={[Math.floor(minBank - 10), Math.ceil(maxBank + 10)]} tickFormatter={(v) => `$${v}`} />
+            <YAxis tick={{ fill: "hsl(215, 12%, 50%)", fontSize: 11 }} tickLine={false} axisLine={false} domain={[Math.floor(minBank - 10), Math.ceil(maxBank + 10)]} tickFormatter={(v) => `€${v}`} />
             <Tooltip
               contentStyle={{
                 background: "hsl(220, 18%, 12%)",
@@ -117,7 +117,7 @@ export function BankrollChart({ bets, initialBank = 0 }: BankrollChartProps) {
                 color: "hsl(210, 20%, 92%)",
                 fontSize: 13,
               }}
-              formatter={(value: number) => [`$${value.toFixed(2)}`, "Bank"]}
+              formatter={(value: number) => [`€${value.toFixed(2)}`, "Bank"]}
             />
             <Area
               type="monotone"

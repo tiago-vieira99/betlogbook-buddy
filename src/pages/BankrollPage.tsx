@@ -42,7 +42,7 @@ const BankrollPage = () => {
           <div className="flex-1 min-w-0">
             <h1 className="text-lg font-bold text-foreground tracking-tight truncate">{bankroll.name}</h1>
             <p className="text-xs text-muted-foreground">
-              Started with ${bankroll.initialValue.toFixed(2)} • Current: <span className={currentBank >= bankroll.initialValue ? "text-win" : "text-loss"}>${currentBank.toFixed(2)}</span>
+              Started with €{bankroll.initialValue.toFixed(2)} • Current: <span className={currentBank >= bankroll.initialValue ? "text-win" : "text-loss"}>€{currentBank.toFixed(2)}</span>
             </p>
           </div>
         </div>

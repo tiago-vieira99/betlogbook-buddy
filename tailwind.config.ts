@@ -53,7 +53,7 @@ export default {
         },
         win: "hsl(var(--win))",
         loss: "hsl(var(--loss))",
-        pending: "hsl(var(--pending))",
+        ongoing: "hsl(var(--ongoing))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",

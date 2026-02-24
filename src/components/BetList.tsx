@@ -14,7 +14,7 @@ interface BetListProps {
 const statusStyles: Record<BetStatus, string> = {
   WON: "text-win bg-win/10 border-win/20",
   LOST: "text-loss bg-loss/10 border-loss/20",
-  PENDING: "text-pending bg-pending/10 border-pending/20",
+  ongoing: "text-ongoing bg-ongoing/10 border-ongoing/20",
 };
 
 function BetRow({ bet, onUpdate, onDelete }: { bet: Bet; onUpdate: BetListProps["onUpdate"]; onDelete: BetListProps["onDelete"] }) {
@@ -34,12 +34,12 @@ function BetRow({ bet, onUpdate, onDelete }: { bet: Bet; onUpdate: BetListProps[
         </div>
         <div className="text-center">
           <p className="text-xs text-muted-foreground">Stake</p>
-          <p className="text-foreground">${bet.stake.toFixed(2)}</p>
+          <p className="text-foreground">€{bet.stake.toFixed(2)}</p>
         </div>
         <div className="text-center">
           <p className="text-xs text-muted-foreground">P&L</p>
-          <p className={pnl >= 0 && bet.status !== "PENDING" ? "text-win" : pnl < 0 ? "text-loss" : "text-muted-foreground"}>
-            {bet.status === "PENDING" ? "—" : `${pnl >= 0 ? "+" : ""}$${pnl.toFixed(2)}`}
+          <p className={pnl >= 0 && bet.status !== "ongoing" ? "text-win" : pnl < 0 ? "text-loss" : "text-muted-foreground"}>
+            {bet.status === "ongoing" ? "—" : `${pnl >= 0 ? "+" : ""}€${pnl.toFixed(2)}`}
           </p>
         </div>
       </div>
@@ -50,7 +50,7 @@ function BetRow({ bet, onUpdate, onDelete }: { bet: Bet; onUpdate: BetListProps[
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="bg-popover border-border z-50">
-            <SelectItem value="PENDING">⏳ Pending</SelectItem>
+            <SelectItem value="ongoing">⏳ ongoing</SelectItem>
             <SelectItem value="WON">✅ Won</SelectItem>
             <SelectItem value="LOST">❌ Lost</SelectItem>
           </SelectContent>
@@ -113,7 +113,7 @@ export function BetList({ bets, onUpdate, onDelete }: BetListProps) {
               <span className="text-xs text-muted-foreground">({group.bets.length} bets)</span>
             </div>
             <span className={`font-mono font-bold text-sm ${group.pnl >= 0 ? "text-win" : "text-loss"}`}>
-              {group.pnl >= 0 ? "+" : ""}${group.pnl.toFixed(2)}
+              {group.pnl >= 0 ? "+" : ""}€{group.pnl.toFixed(2)}
             </span>
           </CollapsibleTrigger>
           <CollapsibleContent className="pl-4 pt-2 space-y-2">

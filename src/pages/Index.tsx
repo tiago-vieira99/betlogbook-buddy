@@ -62,7 +62,7 @@ const Index = () => {
                 <Input placeholder="e.g. Football Strategy" value={name} onChange={(e) => setName(e.target.value)} />
               </div>
               <div className="space-y-2">
-                <Label>Initial Amount ($)</Label>
+                <Label>Initial Amount (€)</Label>
                 <Input type="number" step="0.01" min="0" placeholder="e.g. 500" value={amount} onChange={(e) => setAmount(e.target.value)} />
               </div>
               <div className="flex items-end">
@@ -96,15 +96,15 @@ const Index = () => {
                 <div className="flex items-center gap-6 font-mono text-sm">
                   <div className="text-center">
                     <p className="text-xs text-muted-foreground">Initial</p>
-                    <p className="text-foreground">${br.initialValue.toFixed(2)}</p>
+                    <p className="text-foreground">€{br.initialValue.toFixed(2)}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-xs text-muted-foreground">Balance</p>
-                    <p className={br.balance >= 0 ? "text-win" : "text-loss"}>${(br.initialValue + br.balance).toFixed(2)}</p>
+                    <p className={br.balance >= 0 ? "text-win" : "text-loss"}>€{(br.initialValue + br.balance).toFixed(2)}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-xs text-muted-foreground">P&L</p>
-                    <p className={br.balance >= 0 ? "text-win" : "text-loss"}>{br.balance >= 0 ? "+" : ""}${br.balance.toFixed(2)}</p>
+                    <p className={br.balance >= 0 ? "text-win" : "text-loss"}>{br.balance >= 0 ? "+" : ""}€{br.balance.toFixed(2)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">

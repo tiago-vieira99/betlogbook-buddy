@@ -1,4 +1,4 @@
-export type BetStatus = "WON" | "LOST" | "PENDING";
+export type BetStatus = "WON" | "LOST" | "ONGOING";
 
 export interface Bet {
   id: number;

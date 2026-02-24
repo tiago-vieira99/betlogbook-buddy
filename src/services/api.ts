@@ -1,14 +1,16 @@
 import { Bankroll, Bet } from "@/types/bet";
+import { log } from "console";
 
 // ============================================================
 // 🔧 CONFIGURATION — Edit the base URL to point to your API
 // ============================================================
-const API_BASE_URL = "https://your-api-url.com/api"; // <-- EDIT THIS
+const API_BASE_URL = "http://158.220.112.147:8880/api"; // <-- EDIT THIS
 
 // Optional: Add your auth headers or API key here
 function getHeaders(): HeadersInit {
   return {
-    "Content-Type": "application/json",
+    "accept": "*/*",
+    "User-Agent": "Mozilla/5.0"
     // "Authorization": "Bearer YOUR_TOKEN_HERE",  // <-- UNCOMMENT & EDIT
     // "x-api-key": "YOUR_API_KEY_HERE",           // <-- UNCOMMENT & EDIT
   };
@@ -19,7 +21,7 @@ function getHeaders(): HeadersInit {
 // ============================================================
 
 export async function fetchBankrolls(): Promise<Bankroll[]> {
-  const res = await fetch(`${API_BASE_URL}/bankrolls`, {
+  const res = await fetch(`${API_BASE_URL}/bankroll/`, {
     method: "GET",
     headers: getHeaders(),
   });
@@ -28,7 +30,7 @@ export async function fetchBankrolls(): Promise<Bankroll[]> {
 }
 
 export async function fetchBankroll(id: number): Promise<Bankroll | null> {
-  const res = await fetch(`${API_BASE_URL}/bankrolls/${id}`, {
+  const res = await fetch(`${API_BASE_URL}/bankroll/${id}`, {
     method: "GET",
     headers: getHeaders(),
   });
@@ -41,7 +43,7 @@ export async function createBankroll(
   name: string,
   initialValue: number
 ): Promise<Bankroll> {
-  const res = await fetch(`${API_BASE_URL}/bankrolls`, {
+  const res = await fetch(`${API_BASE_URL}/bankroll/new`, {
     method: "POST",
     headers: getHeaders(),
     body: JSON.stringify({ name, initialValue }),
@@ -51,7 +53,7 @@ export async function createBankroll(
 }
 
 export async function deleteBankrollApi(id: number): Promise<void> {
-  const res = await fetch(`${API_BASE_URL}/bankrolls/${id}`, {
+  const res = await fetch(`${API_BASE_URL}/bankroll/${id}`, {
     method: "DELETE",
     headers: getHeaders(),
   });
@@ -63,7 +65,7 @@ export async function deleteBankrollApi(id: number): Promise<void> {
 // ============================================================
 
 export async function fetchBets(bankrollId: number): Promise<Bet[]> {
-  const res = await fetch(`${API_BASE_URL}/bankrolls/${bankrollId}/bets`, {
+  const res = await fetch(`${API_BASE_URL}/notebets/${bankrollId}`, {
     method: "GET",
     headers: getHeaders(),
   });
@@ -75,7 +77,7 @@ export async function createBet(
   bankrollId: number,
   bet: Omit<Bet, "id">
 ): Promise<Bet> {
-  const res = await fetch(`${API_BASE_URL}/bankrolls/${bankrollId}/bets`, {
+  const res = await fetch(`${API_BASE_URL}/notebets/${bankrollId}/new`, {
     method: "POST",
     headers: getHeaders(),
     body: JSON.stringify(bet),
@@ -89,12 +91,15 @@ export async function updateBetApi(
   betId: number,
   updates: Partial<Bet>
 ): Promise<Bet> {
+  const params = new URLSearchParams({
+    status: updates.status,
+  });
+
   const res = await fetch(
-    `${API_BASE_URL}/bankrolls/${bankrollId}/bets/${betId}`,
+    `${API_BASE_URL}/notebets/${bankrollId}/update/${betId}?${params}`,
     {
-      method: "PATCH",
+      method: "PUT",
       headers: getHeaders(),
-      body: JSON.stringify(updates),
     }
   );
   if (!res.ok) throw new Error("Failed to update bet");
@@ -106,7 +111,7 @@ export async function deleteBetApi(
   betId: number
 ): Promise<void> {
   const res = await fetch(
-    `${API_BASE_URL}/bankrolls/${bankrollId}/bets/${betId}`,
+    `${API_BASE_URL}/notebets/${bankrollId}/delete/${betId}`,
     {
       method: "DELETE",
       headers: getHeaders(),

@@ -18,7 +18,7 @@ export function AddBetForm({ onAdd }: AddBetFormProps) {
   const [form, setForm] = useState({
     odd: "",
     stake: "",
-    status: "PENDING" as BetStatus,
+    status: "ONGOING" as BetStatus,
     date: todayStr,
     comment: "",
   });
@@ -38,7 +38,7 @@ export function AddBetForm({ onAdd }: AddBetFormProps) {
     setForm({
       odd: "",
       stake: "",
-      status: "PENDING",
+      status: "ONGOING",
       date: todayStr,
       comment: "",
     });
@@ -79,7 +79,7 @@ export function AddBetForm({ onAdd }: AddBetFormProps) {
           <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v as BetStatus })}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="PENDING">⏳ Pending</SelectItem>
+              <SelectItem value="ONGOING">⏳ Ongoing</SelectItem>
               <SelectItem value="WON">✅ Won</SelectItem>
               <SelectItem value="LOST">❌ Lost</SelectItem>
             </SelectContent>
