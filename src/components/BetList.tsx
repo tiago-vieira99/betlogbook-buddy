@@ -14,7 +14,7 @@ interface BetListProps {
 const statusStyles: Record<BetStatus, string> = {
   WON: "text-win bg-win/10 border-win/20",
   LOST: "text-loss bg-loss/10 border-loss/20",
-  ongoing: "text-ongoing bg-ongoing/10 border-ongoing/20",
+  ONGOING: "text-ongoing bg-ongoing/10 border-ongoing/20",
 };
 
 function BetRow({ bet, onUpdate, onDelete }: { bet: Bet; onUpdate: BetListProps["onUpdate"]; onDelete: BetListProps["onDelete"] }) {
@@ -38,8 +38,8 @@ function BetRow({ bet, onUpdate, onDelete }: { bet: Bet; onUpdate: BetListProps[
         </div>
         <div className="text-center">
           <p className="text-xs text-muted-foreground">P&L</p>
-          <p className={pnl >= 0 && bet.status !== "ongoing" ? "text-win" : pnl < 0 ? "text-loss" : "text-muted-foreground"}>
-            {bet.status === "ongoing" ? "—" : `${pnl >= 0 ? "+" : ""}€${pnl.toFixed(2)}`}
+          <p className={pnl >= 0 && bet.status !== "ONGOING" ? "text-win" : pnl < 0 ? "text-loss" : "text-muted-foreground"}>
+            {bet.status === "ONGOING" ? "—" : `${pnl >= 0 ? "+" : ""}€${pnl.toFixed(2)}`}
           </p>
         </div>
       </div>
@@ -50,7 +50,7 @@ function BetRow({ bet, onUpdate, onDelete }: { bet: Bet; onUpdate: BetListProps[
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="bg-popover border-border z-50">
-            <SelectItem value="ongoing">⏳ ongoing</SelectItem>
+            <SelectItem value="ONGOING">⏳ Ongoing</SelectItem>
             <SelectItem value="WON">✅ Won</SelectItem>
             <SelectItem value="LOST">❌ Lost</SelectItem>
           </SelectContent>
@@ -105,7 +105,7 @@ export function BetList({ bets, onUpdate, onDelete }: BetListProps) {
   return (
     <div className="space-y-3">
       {grouped.map((group) => (
-        <Collapsible key={group.key} defaultOpen>
+        <Collapsible key={group.key}>
           <CollapsibleTrigger className="w-full rounded-lg bg-card border border-border p-4 flex items-center justify-between hover:bg-secondary/50 transition-colors group">
             <div className="flex items-center gap-3">
               <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform group-data-[state=closed]:-rotate-90" />
