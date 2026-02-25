@@ -75,7 +75,7 @@ const Index = () => {
             <BarChart3 className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h1 className="text-lg font-bold text-foreground tracking-tight">BetTracker</h1>
+            <h1 className="text-lg font-bold text-foreground tracking-tight">BetLogger</h1>
             <p className="text-xs text-muted-foreground">Track your bets, maximize your edge</p>
           </div>
         </div>
