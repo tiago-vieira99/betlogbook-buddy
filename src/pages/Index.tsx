@@ -25,7 +25,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#0e242a]">
       <header className="border-b border-border">
         <div className="container max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -41,15 +41,15 @@ const Index = () => {
       <main className="container max-w-4xl mx-auto px-4 py-8 space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold text-foreground">Your Bankrolls</h2>
-          {!showForm && (
-            <Button onClick={() => setShowForm(true)} className="gap-2">
+          {!showForm &&
+          <Button onClick={() => setShowForm(true)} className="gap-2">
               <Plus className="w-4 h-4" /> New Bankroll
             </Button>
-          )}
+          }
         </div>
 
-        {showForm && (
-          <form onSubmit={handleCreate} className="rounded-lg bg-card border border-border p-5 animate-fade-in">
+        {showForm &&
+        <form onSubmit={handleCreate} className="rounded-lg bg-card border border-border p-5 animate-fade-in">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-foreground">Create Bankroll</h3>
               <Button type="button" variant="ghost" size="icon" onClick={() => setShowForm(false)}>
@@ -70,22 +70,22 @@ const Index = () => {
               </div>
             </div>
           </form>
-        )}
+        }
 
-        {bankrolls.length === 0 && !showForm ? (
-          <div className="rounded-lg bg-card border border-border p-12 text-center animate-fade-in">
+        {bankrolls.length === 0 && !showForm ?
+        <div className="rounded-lg bg-card border border-border p-12 text-center animate-fade-in">
             <Wallet className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
             <p className="text-muted-foreground text-lg">No bankrolls yet.</p>
             <p className="text-sm text-muted-foreground">Create your first bankroll to start tracking bets!</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {bankrolls.map((br) => (
-              <div
-                key={br.id}
-                className="rounded-lg bg-card border border-border p-5 flex flex-col md:flex-row md:items-center gap-4 animate-fade-in hover:border-primary/30 transition-colors cursor-pointer group"
-                onClick={() => navigate(`/bankroll/${br.id}`)}
-              >
+          </div> :
+
+        <div className="space-y-3">
+            {bankrolls.map((br) =>
+          <div
+            key={br.id}
+            className="rounded-lg bg-card border border-border p-5 flex flex-col md:flex-row md:items-center gap-4 animate-fade-in hover:border-primary/30 transition-colors cursor-pointer group"
+            onClick={() => navigate(`/bankroll/${br.id}`)}>
+
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                   <Wallet className="w-5 h-5 text-primary" />
                 </div>
@@ -109,22 +109,22 @@ const Index = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-muted-foreground hover:text-loss"
-                    onClick={(e) => { e.stopPropagation(); deleteBankroll(br.id); }}
-                  >
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:text-loss"
+                onClick={(e) => {e.stopPropagation();deleteBankroll(br.id);}}>
+
                     <Trash2 className="w-4 h-4" />
                   </Button>
                   <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                 </div>
               </div>
-            ))}
+          )}
           </div>
-        )}
+        }
       </main>
-    </div>
-  );
+    </div>);
+
 };
 
 export default Index;
