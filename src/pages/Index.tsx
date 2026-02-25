@@ -5,6 +5,49 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BarChart3, Plus, Trash2, ArrowRight, Wallet, X } from "lucide-react";
+import { Bankroll } from "@/types/bet";
+import { NavigateFunction } from "react-router-dom";
+
+function BankrollCard({ br, navigate, deleteBankroll, disabled }: { br: Bankroll; navigate: NavigateFunction; deleteBankroll: (id: number) => void; disabled?: boolean }) {
+  return (
+    <div
+      key={br.id}
+      className={`rounded-lg bg-card border border-border p-5 flex flex-col md:flex-row md:items-center gap-4 animate-fade-in transition-colors cursor-pointer group ${disabled ? "opacity-50 hover:border-border" : "hover:border-primary/30"}`}
+      onClick={() => navigate(`/bankroll/${br.id}`)}>
+      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+        <Wallet className="w-5 h-5 text-primary" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="font-semibold text-foreground">{br.name}</p>
+        {br.description && <p className="text-xs text-muted-foreground">{br.description}</p>}
+      </div>
+      <div className="flex items-center gap-6 font-mono text-sm">
+        <div className="text-center">
+          <p className="text-xs text-muted-foreground">Initial</p>
+          <p className="text-foreground">€{br.initialValue.toFixed(2)}</p>
+        </div>
+        <div className="text-center">
+          <p className="text-xs text-muted-foreground">Balance</p>
+          <p className={br.balance >= 0 ? "text-win" : "text-loss"}>€{(br.initialValue + br.balance).toFixed(2)}</p>
+        </div>
+        <div className="text-center">
+          <p className="text-xs text-muted-foreground">P&L</p>
+          <p className={br.balance >= 0 ? "text-win" : "text-loss"}>{br.balance >= 0 ? "+" : ""}€{br.balance.toFixed(2)}</p>
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-muted-foreground hover:text-loss"
+          onClick={(e) => { e.stopPropagation(); deleteBankroll(br.id); }}>
+          <Trash2 className="w-4 h-4" />
+        </Button>
+        <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+      </div>
+    </div>
+  );
+}
 
 const Index = () => {
   const { bankrolls, addBankroll, deleteBankroll } = useBankrolls();
@@ -79,48 +122,25 @@ const Index = () => {
             <p className="text-sm text-muted-foreground">Create your first bankroll to start tracking bets!</p>
           </div> :
 
-        <div className="space-y-3">
-            {bankrolls.map((br) =>
-          <div
-            key={br.id}
-            className="rounded-lg bg-card border border-border p-5 flex flex-col md:flex-row md:items-center gap-4 animate-fade-in hover:border-primary/30 transition-colors cursor-pointer group"
-            onClick={() => navigate(`/bankroll/${br.id}`)}>
-
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                  <Wallet className="w-5 h-5 text-primary" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-foreground">{br.name}</p>
-                  {br.description && <p className="text-xs text-muted-foreground">{br.description}</p>}
-                </div>
-                <div className="flex items-center gap-6 font-mono text-sm">
-                  <div className="text-center">
-                    <p className="text-xs text-muted-foreground">Initial</p>
-                    <p className="text-foreground">€{br.initialValue.toFixed(2)}</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-xs text-muted-foreground">Balance</p>
-                    <p className={br.balance >= 0 ? "text-win" : "text-loss"}>€{(br.initialValue + br.balance).toFixed(2)}</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-xs text-muted-foreground">P&L</p>
-                    <p className={br.balance >= 0 ? "text-win" : "text-loss"}>{br.balance >= 0 ? "+" : ""}€{br.balance.toFixed(2)}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                variant="ghost"
-                size="icon"
-                className="text-muted-foreground hover:text-loss"
-                onClick={(e) => {e.stopPropagation();deleteBankroll(br.id);}}>
-
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                  <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                </div>
-              </div>
+        <>
+          {bankrolls.filter(br => br.active !== false).length > 0 && (
+            <div className="space-y-3">
+              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Active</h3>
+              {bankrolls.filter(br => br.active !== false).map((br) => (
+                <BankrollCard key={br.id} br={br} navigate={navigate} deleteBankroll={deleteBankroll} />
+              ))}
+            </div>
           )}
-          </div>
+
+          {bankrolls.filter(br => br.active === false).length > 0 && (
+            <div className="space-y-3">
+              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Disabled</h3>
+              {bankrolls.filter(br => br.active === false).map((br) => (
+                <BankrollCard key={br.id} br={br} navigate={navigate} deleteBankroll={deleteBankroll} disabled />
+              ))}
+            </div>
+          )}
+        </>
         }
       </main>
     </div>);
