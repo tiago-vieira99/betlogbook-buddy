@@ -15,6 +15,7 @@ export interface Bankroll {
   id: number;
   name: string;
   description: string;
+  active: boolean;
   balance: number;
   numBets: number;
   roi: number;
