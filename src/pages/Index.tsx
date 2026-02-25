@@ -126,7 +126,7 @@ const Index = () => {
           {bankrolls.filter(br => br.active !== false).length > 0 && (
             <div className="space-y-3">
               <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Active</h3>
-              {bankrolls.filter(br => br.active !== false).map((br) => (
+              {[...bankrolls.filter(br => br.active !== false)].sort((a, b) => b.numBets - a.numBets).map((br) => (
                 <BankrollCard key={br.id} br={br} navigate={navigate} deleteBankroll={deleteBankroll} />
               ))}
             </div>
@@ -135,7 +135,7 @@ const Index = () => {
           {bankrolls.filter(br => br.active === false).length > 0 && (
             <div className="space-y-3">
               <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Disabled</h3>
-              {bankrolls.filter(br => br.active === false).map((br) => (
+              {[...bankrolls.filter(br => br.active === false)].sort((a, b) => b.numBets - a.numBets).map((br) => (
                 <BankrollCard key={br.id} br={br} navigate={navigate} deleteBankroll={deleteBankroll} disabled />
               ))}
             </div>
