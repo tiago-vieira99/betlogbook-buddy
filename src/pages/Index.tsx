@@ -4,7 +4,7 @@ import { useBankrolls } from "@/hooks/useBankrolls";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { BarChart3, Plus, Trash2, ArrowRight, Wallet, X } from "lucide-react";
+import { Plus, Trash2, ArrowRight, Wallet, X } from "lucide-react";
 import { Bankroll } from "@/types/bet";
 import { NavigateFunction } from "react-router-dom";
 
@@ -73,9 +73,7 @@ const Index = () => {
     <div className="min-h-screen bg-[#0e242a]">
       <header className="border-b border-border">
         <div className="container max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-            <BarChart3 className="w-5 h-5 text-primary" />
-          </div>
+          <img src="/favicon.ico" alt="BetLogger" className="w-9 h-9 rounded-lg" />
           <div>
             <h1 className="text-lg font-bold text-foreground tracking-tight">BetLogger</h1>
             <p className="text-xs text-muted-foreground">Track your bets, maximize your edge</p>
