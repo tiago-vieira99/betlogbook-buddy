@@ -5,7 +5,8 @@ import { StatsCards } from "@/components/StatsCards";
 import { AddBetForm } from "@/components/AddBetForm";
 import { BetList } from "@/components/BetList";
 import { BankrollChart } from "@/components/BankrollChart";
-import { ArrowLeft, Wallet } from "lucide-react";
+import { BankrollStats } from "@/components/BankrollStats";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const BankrollPage = () => {
@@ -48,6 +49,7 @@ const BankrollPage = () => {
 
       <main className="container max-w-6xl mx-auto px-4 py-6 space-y-6">
         <StatsCards stats={stats} />
+        <BankrollStats bankroll={bankroll} />
         <BankrollChart bets={bets} initialBank={bankroll.initialValue} />
 
         <div className="flex items-center justify-between">
