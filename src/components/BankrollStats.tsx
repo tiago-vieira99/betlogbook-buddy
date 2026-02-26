@@ -17,7 +17,7 @@ export function BankrollStats({ bankroll }: BankrollStatsProps) {
   return (
     <div className="rounded-lg bg-card border border-border px-4 py-3 animate-fade-in">
       <p className="text-xs text-muted-foreground mb-2 font-medium">Bankroll Details</p>
-      <div className="flex flex-wrap gap-x-4 gap-y-2 justify-start">
+      <div className="flex flex-wrap gap-x-4 gap-y-2 justify-center">
         <Stat label="Avg Odd" value={bankroll.oddAvg?.toFixed(2) ?? "—"} />
         <Stat label="Avg Stake" value={bankroll.stakeAvg ? `€${bankroll.stakeAvg.toFixed(2)}` : "—"} />
         <Stat label="🟢 Rate" value={bankroll.greensRate ? `${bankroll.greensRate.toFixed(1)}%` : "—"} />
