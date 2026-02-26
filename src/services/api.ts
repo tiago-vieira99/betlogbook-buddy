@@ -4,7 +4,7 @@ import { log } from "console";
 // ============================================================
 // 🔧 CONFIGURATION — Edit the base URL to point to your API
 // ============================================================
-const API_BASE_URL = "http://192.168.1.192:8880/api"; // <-- EDIT THIS
+const API_BASE_URL = "http://host.docker.internal:8880/api"; // <-- EDIT THIS
 
 // Optional: Add your auth headers or API key here
 function getHeaders(): HeadersInit {
