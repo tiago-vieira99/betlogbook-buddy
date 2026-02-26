@@ -69,7 +69,7 @@ export function AddBetForm({ onAdd }: AddBetFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-lg bg-card border border-border p-5 animate-fade-in">
+    <form onSubmit={handleSubmit} className="rounded-lg bg-card border border-border p-5 animate-fade-in w-full">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-foreground">Add New Bet</h3>
         <Button type="button" variant="ghost" size="icon" onClick={() => setOpen(false)}>

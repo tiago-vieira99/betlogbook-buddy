@@ -54,8 +54,8 @@ const BankrollPage = () => {
 
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-foreground">Bets</h2>
-          <AddBetForm onAdd={addBet} />
         </div>
+        <AddBetForm onAdd={addBet} />
 
         <BetList bets={bets} onUpdate={updateBet} onDelete={deleteBet} />
       </main>
