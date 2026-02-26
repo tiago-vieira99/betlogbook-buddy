@@ -24,9 +24,9 @@ export function useBankrolls() {
     loadBankrolls();
   }, [loadBankrolls]);
 
-  const addBankroll = async (name: string, initialValue: number): Promise<Bankroll | null> => {
+  const addBankroll = async (name: string, initialValue: number, description?: string): Promise<Bankroll | null> => {
     try {
-      const bankroll = await createBankroll(name, initialValue);
+      const bankroll = await createBankroll(name, initialValue, description);
       setBankrolls((prev) => [bankroll, ...prev]);
       return bankroll;
     } catch (err) {

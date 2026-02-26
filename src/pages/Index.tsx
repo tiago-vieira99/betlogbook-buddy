@@ -53,15 +53,17 @@ const Index = () => {
   const { bankrolls, addBankroll, deleteBankroll } = useBankrolls();
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const navigate = useNavigate();
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || !amount) return;
-    const bankroll = await addBankroll(name.trim(), parseFloat(amount));
+    const bankroll = await addBankroll(name.trim(), parseFloat(amount), description.trim() || undefined);
     if (!bankroll) return;
     setName("");
+    setDescription("");
     setAmount("");
     setShowForm(false);
     navigate(`/bankroll/${bankroll.id}`);
@@ -99,7 +101,7 @@ const Index = () => {
                 <X className="w-4 h-4" />
               </Button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Name</Label>
                 <Input placeholder="e.g. Football Strategy" value={name} onChange={(e) => setName(e.target.value)} />
@@ -108,9 +110,13 @@ const Index = () => {
                 <Label>Initial Amount (€)</Label>
                 <Input type="number" step="0.01" min="0" placeholder="e.g. 500" value={amount} onChange={(e) => setAmount(e.target.value)} />
               </div>
-              <div className="flex items-end">
-                <Button type="submit" className="w-full">Create</Button>
-              </div>
+            </div>
+            <div className="mt-4 space-y-2">
+              <Label>Description <span className="text-muted-foreground font-normal">(optional)</span></Label>
+              <Input placeholder="e.g. Long-term value betting strategy" value={description} onChange={(e) => setDescription(e.target.value)} />
+            </div>
+            <div className="mt-4">
+              <Button type="submit" className="w-full">Create</Button>
             </div>
           </form>
         }

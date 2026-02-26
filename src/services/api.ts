@@ -41,12 +41,13 @@ export async function fetchBankroll(id: number): Promise<Bankroll | null> {
 
 export async function createBankroll(
   name: string,
-  initialValue: number
+  initialValue: number,
+  description?: string
 ): Promise<Bankroll> {
   const res = await fetch(`${API_BASE_URL}/bankroll/new`, {
     method: "POST",
     headers: getHeaders(),
-    body: JSON.stringify({ name, initialValue }),
+    body: JSON.stringify({ name, initialValue, ...(description ? { description } : {}) }),
   });
   if (!res.ok) throw new Error("Failed to create bankroll");
   return res.json();
