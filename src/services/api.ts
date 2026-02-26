@@ -10,7 +10,8 @@ const API_BASE_URL = "http://192.168.1.192:8880/api"; // <-- EDIT THIS
 function getHeaders(): HeadersInit {
   return {
     "accept": "*/*",
-    "User-Agent": "Mozilla/5.0"
+    "User-Agent": "Mozilla/5.0",
+    "Content-Type": "application/json",
     // "Authorization": "Bearer YOUR_TOKEN_HERE",  // <-- UNCOMMENT & EDIT
     // "x-api-key": "YOUR_API_KEY_HERE",           // <-- UNCOMMENT & EDIT
   };
