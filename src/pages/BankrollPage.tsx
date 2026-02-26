@@ -36,9 +36,7 @@ const BankrollPage = () => {
           <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0">
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-            <Wallet className="w-5 h-5 text-primary" />
-          </div>
+          <img src="/favicon.ico" alt="BetLogger" className="w-9 h-9 rounded-lg shrink-0" />
           <div className="flex-1 min-w-0">
             <h1 className="text-lg font-bold text-foreground tracking-tight truncate">{bankroll.name}</h1>
             <p className="text-xs text-muted-foreground">
