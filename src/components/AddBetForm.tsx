@@ -1,10 +1,13 @@
 import { useState } from "react";
-import { Bet, BetStatus } from "@/types/bet";
+import { Bet } from "@/types/bet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, X } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Plus, X, CalendarIcon } from "lucide-react";
+import { format, parse } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface AddBetFormProps {
   onAdd: (bet: Omit<Bet, "id">) => void;
@@ -18,27 +21,39 @@ export function AddBetForm({ onAdd }: AddBetFormProps) {
   const [form, setForm] = useState({
     odd: "",
     stake: "",
-    status: "ONGOING" as BetStatus,
     date: todayStr,
     comment: "",
   });
+
+  const parseDate = (dateStr: string): Date | undefined => {
+    try {
+      return parse(dateStr, "dd/MM/yyyy", new Date());
+    } catch {
+      return undefined;
+    }
+  };
+
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date) {
+      setForm({ ...form, date: format(date, "dd/MM/yyyy") });
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.odd || !form.stake) return;
     onAdd({
-      bankrollID: 0, // Will be set by the hook/API
+      bankrollID: 0,
       odd: parseFloat(form.odd),
       stake: parseFloat(form.stake),
-      balance: 0, // Calculated by the API
-      status: form.status,
+      balance: 0,
+      status: "ONGOING",
       date: form.date,
       comment: form.comment || "",
     });
     setForm({
       odd: "",
       stake: "",
-      status: "ONGOING",
       date: todayStr,
       comment: "",
     });
@@ -61,7 +76,7 @@ export function AddBetForm({ onAdd }: AddBetFormProps) {
           <X className="w-4 h-4" />
         </Button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="space-y-2">
           <Label>Odd (decimal)</Label>
           <Input type="number" step="0.01" min="1" placeholder="e.g. 1.85" value={form.odd} onChange={(e) => setForm({ ...form, odd: e.target.value })} />
@@ -71,19 +86,30 @@ export function AddBetForm({ onAdd }: AddBetFormProps) {
           <Input type="number" step="0.01" min="0" placeholder="e.g. 50" value={form.stake} onChange={(e) => setForm({ ...form, stake: e.target.value })} />
         </div>
         <div className="space-y-2">
-          <Label>Date (DD/MM/YYYY)</Label>
-          <Input placeholder="e.g. 01/10/2022" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
-        </div>
-        <div className="space-y-2">
-          <Label>Status</Label>
-          <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v as BetStatus })}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ONGOING">⏳ Ongoing</SelectItem>
-              <SelectItem value="WON">✅ Won</SelectItem>
-              <SelectItem value="LOST">❌ Lost</SelectItem>
-            </SelectContent>
-          </Select>
+          <Label>Date</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full justify-start text-left font-normal",
+                  !form.date && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {form.date || "Pick a date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={parseDate(form.date)}
+                onSelect={handleDateSelect}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
         <div className="space-y-2">
           <Label>Comment <span className="text-muted-foreground">(optional)</span></Label>

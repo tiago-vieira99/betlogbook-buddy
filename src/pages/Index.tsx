@@ -4,11 +4,11 @@ import { useBankrolls } from "@/hooks/useBankrolls";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Trash2, ArrowRight, Wallet, X } from "lucide-react";
+import { Plus, ArrowRight, Wallet, X } from "lucide-react";
 import { Bankroll } from "@/types/bet";
 import { NavigateFunction } from "react-router-dom";
 
-function BankrollCard({ br, navigate, deleteBankroll, disabled }: { br: Bankroll; navigate: NavigateFunction; deleteBankroll: (id: number) => void; disabled?: boolean }) {
+function BankrollCard({ br, navigate, disabled }: { br: Bankroll; navigate: NavigateFunction; disabled?: boolean }) {
   return (
     <div
       key={br.id}
@@ -35,16 +35,7 @@ function BankrollCard({ br, navigate, deleteBankroll, disabled }: { br: Bankroll
           <p className={br.balance >= 0 ? "text-win" : "text-loss"}>{br.balance >= 0 ? "+" : ""}€{br.balance.toFixed(2)}</p>
         </div>
       </div>
-      <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-muted-foreground hover:text-loss"
-          onClick={(e) => { e.stopPropagation(); deleteBankroll(br.id); }}>
-          <Trash2 className="w-4 h-4" />
-        </Button>
-        <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-      </div>
+      <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
     </div>
   );
 }
@@ -131,7 +122,7 @@ const Index = () => {
             <div className="space-y-3">
               <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Active</h3>
               {[...bankrolls.filter(br => br.active !== false)].sort((a, b) => b.numBets - a.numBets).map((br) => (
-                <BankrollCard key={br.id} br={br} navigate={navigate} deleteBankroll={deleteBankroll} />
+                <BankrollCard key={br.id} br={br} navigate={navigate} />
               ))}
             </div>
           )}
@@ -140,7 +131,7 @@ const Index = () => {
             <div className="space-y-3">
               <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Disabled</h3>
               {[...bankrolls.filter(br => br.active === false)].sort((a, b) => b.numBets - a.numBets).map((br) => (
-                <BankrollCard key={br.id} br={br} navigate={navigate} deleteBankroll={deleteBankroll} disabled />
+                <BankrollCard key={br.id} br={br} navigate={navigate} disabled />
               ))}
             </div>
           )}
