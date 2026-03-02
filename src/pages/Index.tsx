@@ -32,7 +32,7 @@ function BankrollCard({ br, navigate, disabled }: { br: Bankroll; navigate: Navi
         </div>
         <div className="text-center">
           <p className="text-xs text-muted-foreground">P&L</p>
-          <p className={br.balance >= 0 ? "text-win" : "text-loss"}>{br.balance >= 0 ? "+" : ""}€{br.balance.toFixed(2)}</p>
+          <p className={(br.balance - br.initialValue) >= 0 ? "text-win" : "text-loss"}>{(br.balance - br.initialValue) >= 0 ? "+" : ""}€{(br.balance - br.initialValue).toFixed(2)}</p>
         </div>
       </div>
       <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
