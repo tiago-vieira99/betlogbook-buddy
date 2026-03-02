@@ -33,7 +33,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
       <StatCard label="Total Bets" value={stats.total} icon={BarChart3} />
       <StatCard label="Win Rate" value={`${stats.winRate.toFixed(1)}%`} icon={Target} accent="text-win" />
       <StatCard label="P&L" value={`${stats.totalPnl >= 0 ? "+" : ""}€${stats.totalPnl.toFixed(2)}`} icon={pnlIcon} accent={pnlColor} />
-      <StatCard label="Total Staked" value={`€${stats.totalStaked.toFixed(2)}`} icon={DollarSign} />
+      <StatCard label="ROI" value={`${stats.totalStaked > 0 ? ((stats.totalPnl / stats.totalStaked) * 100).toFixed(1) : "0.0"}%`} icon={DollarSign} accent={stats.totalPnl >= 0 ? "text-win" : "text-loss"} />
       <StatCard label="Wins" value={stats.wins} icon={TrendingUp} accent="text-win" />
       <StatCard label="Ongoing" value={stats.ongoing} icon={Clock} accent="text-ongoing" />
     </div>
