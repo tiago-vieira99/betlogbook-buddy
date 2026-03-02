@@ -24,7 +24,7 @@ function BetRow({ bet, onUpdate, onDelete }: { bet: Bet; onUpdate: BetListProps[
     <div className="rounded-lg bg-secondary/50 border border-border p-4 flex flex-col md:flex-row md:items-center gap-3">
       <div className="flex-1 min-w-0">
         <p className="text-xs text-muted-foreground mb-1">{bet.date}</p>
-        {bet.comment && <p className="text-sm text-muted-foreground">{bet.comment}</p>}
+        <p className="text-sm text-foreground/80">{bet.comment || "—"}</p>
       </div>
 
       <div className="flex items-center gap-4 text-sm font-mono">
