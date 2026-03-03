@@ -15,7 +15,7 @@ const BankrollPage = () => {
   const bankrollId = parseInt(id || "0", 10);
   const { getBankroll } = useBankrolls();
   const bankroll = getBankroll(bankrollId);
-  const { bets, addBet, updateBet, deleteBet, stats } = useBets(bankrollId);
+  const { bets, addBet, updateBet, deleteBet } = useBets(bankrollId);
 
   if (!bankroll) {
     return (
@@ -28,7 +28,7 @@ const BankrollPage = () => {
     );
   }
 
-  const currentBank = bankroll.initialValue + bankroll.balance;
+  const currentBank = bankroll.balance;
 
   return (
     <div className="min-h-screen bg-[#0e242a]">
@@ -48,7 +48,7 @@ const BankrollPage = () => {
       </header>
 
       <main className="container max-w-6xl mx-auto px-4 py-6 space-y-6">
-        <StatsCards stats={stats} />
+        <StatsCards bankroll={bankroll} ongoing={bets.filter(b => b.status === "ONGOING").length} />
         <BankrollStats bankroll={bankroll} />
         <BankrollChart bets={bets} initialBank={bankroll.initialValue} />
 

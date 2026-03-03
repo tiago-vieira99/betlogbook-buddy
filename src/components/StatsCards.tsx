@@ -1,15 +1,9 @@
 import { TrendingUp, TrendingDown, Target, Clock, DollarSign, BarChart3 } from "lucide-react";
+import { Bankroll } from "@/types/bet";
 
 interface StatsCardsProps {
-  stats: {
-    total: number;
-    wins: number;
-    losses: number;
-    ongoing: number;
-    totalStaked: number;
-    totalPnl: number;
-    winRate: number;
-  };
+  bankroll: Bankroll;
+  ongoing: number;
 }
 
 function StatCard({ label, value, icon: Icon, accent }: { label: string; value: string | number; icon: React.ElementType; accent?: string }) {
@@ -24,18 +18,19 @@ function StatCard({ label, value, icon: Icon, accent }: { label: string; value: 
   );
 }
 
-export function StatsCards({ stats }: StatsCardsProps) {
-  const pnlColor = stats.totalPnl >= 0 ? "text-win" : "text-loss";
-  const pnlIcon = stats.totalPnl >= 0 ? TrendingUp : TrendingDown;
+export function StatsCards({ bankroll, ongoing }: StatsCardsProps) {
+  const pnl = bankroll.balance - bankroll.initialValue;
+  const pnlColor = pnl >= 0 ? "text-win" : "text-loss";
+  const pnlIcon = pnl >= 0 ? TrendingUp : TrendingDown;
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
-      <StatCard label="Total Bets" value={stats.total} icon={BarChart3} />
-      <StatCard label="Win Rate" value={`${stats.winRate.toFixed(1)}%`} icon={Target} accent="text-win" />
-      <StatCard label="P&L" value={`${stats.totalPnl >= 0 ? "+" : ""}€${stats.totalPnl.toFixed(2)}`} icon={pnlIcon} accent={pnlColor} />
-      <StatCard label="ROI" value={`${stats.totalStaked > 0 ? ((stats.totalPnl / stats.totalStaked) * 100).toFixed(1) : "0.0"}%`} icon={DollarSign} accent={stats.totalPnl >= 0 ? "text-win" : "text-loss"} />
-      <StatCard label="Wins" value={stats.wins} icon={TrendingUp} accent="text-win" />
-      <StatCard label="Ongoing" value={stats.ongoing} icon={Clock} accent="text-ongoing" />
+      <StatCard label="Total Bets" value={bankroll.numBets} icon={BarChart3} />
+      <StatCard label="Win Rate" value={`${bankroll.greensRate?.toFixed(1) ?? "0.0"}%`} icon={Target} accent="text-win" />
+      <StatCard label="P&L" value={`${pnl >= 0 ? "+" : ""}€${pnl.toFixed(2)}`} icon={pnlIcon} accent={pnlColor} />
+      <StatCard label="ROI" value={`${bankroll.roi?.toFixed(1) ?? "0.0"}%`} icon={DollarSign} accent={bankroll.roi >= 0 ? "text-win" : "text-loss"} />
+      <StatCard label="Wins" value={Math.round((bankroll.greensRate / 100) * bankroll.numBets)} icon={TrendingUp} accent="text-win" />
+      <StatCard label="Ongoing" value={ongoing} icon={Clock} accent="text-ongoing" />
     </div>
   );
 }
