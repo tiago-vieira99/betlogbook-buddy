@@ -55,21 +55,5 @@ export function useBets(bankrollId: number) {
     }
   };
 
-  const stats = {
-    total: bets.length,
-    wins: bets.filter((b) => b.status === "WON").length,
-    losses: bets.filter((b) => b.status === "LOST").length,
-    ongoing: bets.filter((b) => b.status === "ONGOING").length,
-    totalStaked: bets.reduce((sum, b) => sum + b.stake, 0),
-    totalPnl: bets.reduce((sum, b) => {
-      if (b.status === "WON") return sum + b.stake * (b.odd - 1);
-      if (b.status === "LOST") return sum - b.stake;
-      return sum;
-    }, 0),
-    winRate: bets.filter((b) => b.status !== "ONGOING").length > 0
-      ? (bets.filter((b) => b.status === "WON").length / bets.filter((b) => b.status !== "ONGOING").length) * 100
-      : 0,
-  };
-
-  return { bets, addBet, updateBet, deleteBet, stats, loading };
+  return { bets, addBet, updateBet, deleteBet, loading };
 }
