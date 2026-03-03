@@ -28,7 +28,7 @@ const BankrollPage = () => {
     );
   }
 
-  const currentBank = bankroll.balance;
+  const currentBank = bankroll.progression;
 
   return (
     <div className="min-h-screen bg-[#0e242a]">
