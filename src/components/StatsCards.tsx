@@ -19,7 +19,7 @@ function StatCard({ label, value, icon: Icon, accent }: { label: string; value: 
 }
 
 export function StatsCards({ bankroll, ongoing }: StatsCardsProps) {
-  const pnl = bankroll.balance - bankroll.initialValue;
+  const pnl = bankroll.balance;
   const pnlColor = pnl >= 0 ? "text-win" : "text-loss";
   const pnlIcon = pnl >= 0 ? TrendingUp : TrendingDown;
 

@@ -27,8 +27,8 @@ function BankrollCard({ br, navigate, disabled }: { br: Bankroll; navigate: Navi
           <p className="text-foreground">€{br.initialValue.toFixed(2)}</p>
         </div>
         <div className="text-center">
-          <p className="text-xs text-muted-foreground">Balance</p>
-          <p className={br.balance >= 0 ? "text-win" : "text-loss"}>€{br.balance.toFixed(2)}</p>
+          <p className="text-xs text-muted-foreground">Current</p>
+          <p className={br.progression >= br.initialValue ? "text-win" : "text-loss"}>€{br.progression.toFixed(2)}</p>
         </div>
         <div className="text-center">
           <p className="text-xs text-muted-foreground">ROI</p>
