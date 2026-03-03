@@ -4,7 +4,8 @@ import { useBankrolls } from "@/hooks/useBankrolls";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, ArrowRight, Wallet, X } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Plus, ArrowRight, Wallet, X, ChevronDown } from "lucide-react";
 import { Bankroll } from "@/types/bet";
 import { NavigateFunction } from "react-router-dom";
 
@@ -128,12 +129,17 @@ const Index = () => {
           )}
 
           {bankrolls.filter(br => br.active === false).length > 0 && (
-            <div className="space-y-3">
-              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Disabled</h3>
-              {[...bankrolls.filter(br => br.active === false)].sort((a, b) => b.numBets - a.numBets).map((br) => (
-                <BankrollCard key={br.id} br={br} navigate={navigate} disabled />
-              ))}
-            </div>
+            <Collapsible>
+              <CollapsibleTrigger className="flex items-center gap-2 group w-full">
+                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Disabled</h3>
+                <ChevronDown className="w-4 h-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-3 mt-3">
+                {[...bankrolls.filter(br => br.active === false)].sort((a, b) => b.numBets - a.numBets).map((br) => (
+                  <BankrollCard key={br.id} br={br} navigate={navigate} disabled />
+                ))}
+              </CollapsibleContent>
+            </Collapsible>
           )}
         </>
         }
