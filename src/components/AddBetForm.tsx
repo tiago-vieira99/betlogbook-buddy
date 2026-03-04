@@ -79,11 +79,11 @@ export function AddBetForm({ onAdd }: AddBetFormProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="space-y-2">
           <Label>Odd (decimal)</Label>
-          <Input type="number" step="0.01" min="1" placeholder="e.g. 1.85" value={form.odd} onChange={(e) => setForm({ ...form, odd: e.target.value })} />
+          <Input inputMode="decimal" type="number" step="0.01" min="1" placeholder="e.g. 1.85" value={form.odd} onChange={(e) => setForm({ ...form, odd: e.target.value })} />
         </div>
         <div className="space-y-2">
           <Label>Stake (€)</Label>
-          <Input type="number" step="0.01" min="0" placeholder="e.g. 50" value={form.stake} onChange={(e) => setForm({ ...form, stake: e.target.value })} />
+          <Input inputMode="decimal" type="number" step="0.01" min="1" placeholder="e.g. 50" value={form.stake} onChange={(e) => setForm({ ...form, stake: e.target.value })} />
         </div>
         <div className="space-y-2">
           <Label>Date</Label>
