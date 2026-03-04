@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Bankroll } from "@/types/bet";
-import { fetchBankrolls, createBankroll, deleteBankrollApi } from "@/services/api";
+import { fetchBankrolls, fetchBankroll, createBankroll, deleteBankrollApi } from "@/services/api";
 import { toast } from "sonner";
 
 export function useBankrolls() {
@@ -48,5 +48,16 @@ export function useBankrolls() {
 
   const getBankroll = (id: number) => bankrolls.find((b) => b.id === id);
 
-  return { bankrolls, addBankroll, deleteBankroll, getBankroll, loading };
+  const refreshBankroll = async (id: number) => {
+    try {
+      const updated = await fetchBankroll(id);
+      if (updated) {
+        setBankrolls((prev) => prev.map((b) => (b.id === id ? updated : b)));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  return { bankrolls, addBankroll, deleteBankroll, getBankroll, refreshBankroll, loading };
 }

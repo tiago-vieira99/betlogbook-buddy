@@ -13,9 +13,24 @@ const BankrollPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const bankrollId = parseInt(id || "0", 10);
-  const { getBankroll } = useBankrolls();
+  const { getBankroll, refreshBankroll } = useBankrolls();
   const bankroll = getBankroll(bankrollId);
   const { bets, addBet, updateBet, deleteBet } = useBets(bankrollId);
+
+  const handleAddBet = async (bet: Parameters<typeof addBet>[0]) => {
+    await addBet(bet);
+    await refreshBankroll(bankrollId);
+  };
+
+  const handleUpdateBet = async (id: number, updates: Parameters<typeof updateBet>[1]) => {
+    await updateBet(id, updates);
+    await refreshBankroll(bankrollId);
+  };
+
+  const handleDeleteBet = async (id: number) => {
+    await deleteBet(id);
+    await refreshBankroll(bankrollId);
+  };
 
   if (!bankroll) {
     return (
@@ -55,9 +70,9 @@ const BankrollPage = () => {
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-foreground">Bets</h2>
         </div>
-        <AddBetForm onAdd={addBet} />
+        <AddBetForm onAdd={handleAddBet} />
 
-        <BetList bets={bets} onUpdate={updateBet} onDelete={deleteBet} />
+        <BetList bets={bets} onUpdate={handleUpdateBet} onDelete={handleDeleteBet} />
       </main>
     </div>
   );
