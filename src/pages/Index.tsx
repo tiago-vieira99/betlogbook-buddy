@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { fetchBets } from "@/services/api";
 import { useBankrolls } from "@/hooks/useBankrolls";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +10,7 @@ import { Plus, ArrowRight, Wallet, X, ChevronDown } from "lucide-react";
 import { Bankroll } from "@/types/bet";
 import { NavigateFunction } from "react-router-dom";
 
-function BankrollCard({ br, navigate, disabled }: { br: Bankroll; navigate: NavigateFunction; disabled?: boolean }) {
+function BankrollCard({ br, navigate, disabled, ongoingCount }: { br: Bankroll; navigate: NavigateFunction; disabled?: boolean; ongoingCount: number }) {
   return (
     <div
       key={br.id}
@@ -24,8 +25,8 @@ function BankrollCard({ br, navigate, disabled }: { br: Bankroll; navigate: Navi
       </div>
       <div className="flex items-center gap-6 font-mono text-sm">
         <div className="text-center">
-          <p className="text-xs text-muted-foreground">Initial</p>
-          <p className="text-foreground">€{br.initialValue.toFixed(2)}</p>
+          <p className="text-xs text-muted-foreground">Ongoing</p>
+          <p className="text-ongoing">{ongoingCount}</p>
         </div>
         <div className="text-center">
           <p className="text-xs text-muted-foreground">Current</p>
@@ -47,7 +48,20 @@ const Index = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
+  const [ongoingCounts, setOngoingCounts] = useState<Record<number, number>>({});
   const navigate = useNavigate();
+
+  useEffect(() => {
+    bankrolls.forEach(async (br) => {
+      try {
+        const bets = await fetchBets(br.id);
+        const count = bets.filter(b => b.status === "ONGOING").length;
+        setOngoingCounts(prev => ({ ...prev, [br.id]: count }));
+      } catch {
+        // ignore
+      }
+    });
+  }, [bankrolls]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,7 +137,7 @@ const Index = () => {
             <div className="space-y-3">
               <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Active</h3>
               {[...bankrolls.filter(br => br.active !== false)].sort((a, b) => b.numBets - a.numBets).map((br) => (
-                <BankrollCard key={br.id} br={br} navigate={navigate} />
+                <BankrollCard key={br.id} br={br} navigate={navigate} ongoingCount={ongoingCounts[br.id] ?? 0} />
               ))}
             </div>
           )}
@@ -136,7 +150,7 @@ const Index = () => {
               </CollapsibleTrigger>
               <CollapsibleContent className="space-y-3 mt-3">
                 {[...bankrolls.filter(br => br.active === false)].sort((a, b) => b.numBets - a.numBets).map((br) => (
-                  <BankrollCard key={br.id} br={br} navigate={navigate} disabled />
+                  <BankrollCard key={br.id} br={br} navigate={navigate} disabled ongoingCount={ongoingCounts[br.id] ?? 0} />
                 ))}
               </CollapsibleContent>
             </Collapsible>
