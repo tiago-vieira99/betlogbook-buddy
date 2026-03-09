@@ -46,7 +46,7 @@ const BankrollPage = () => {
   const currentBank = bankroll.initialValue + bankroll.balance;
 
   return (
-    <div className="min-h-screen bg-[#0e242a]">
+    <div className="min-h-screen bg-background">
       <header className="border-b border-border">
         <div className="container max-w-6xl mx-auto px-4 py-4 flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0">
