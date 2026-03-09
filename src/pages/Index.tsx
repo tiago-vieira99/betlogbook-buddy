@@ -76,7 +76,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0e242a]">
+    <div className="min-h-screen bg-background">
       <header className="border-b border-border">
         <div className="container max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
           <img src="/favicon.ico" alt="BetLogger" className="w-9 h-9 rounded-lg" />
