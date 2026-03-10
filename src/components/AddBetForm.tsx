@@ -57,7 +57,6 @@ export function AddBetForm({ onAdd }: AddBetFormProps) {
       date: todayStr,
       comment: "",
     });
-    setOpen(false);
   };
 
   if (!open) {
