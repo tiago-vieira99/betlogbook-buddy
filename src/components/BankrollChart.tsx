@@ -6,6 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 interface BankrollChartProps {
   bets: Bet[];
   initialBank?: number;
+  selectedMonth: string;
+  onMonthChange: (month: string) => void;
 }
 
 // Parse DD/MM/YYYY to sortable YYYY-MM-DD
