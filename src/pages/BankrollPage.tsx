@@ -18,6 +18,7 @@ const BankrollPage = () => {
   const { getBankroll, refreshBankroll } = useBankrolls();
   const bankroll = getBankroll(bankrollId);
   const { bets, addBet, updateBet, deleteBet } = useBets(bankrollId);
+  const [selectedMonth, setSelectedMonth] = useState("all");
 
   const handleAddBet = async (bet: Parameters<typeof addBet>[0]) => {
     await addBet(bet);
