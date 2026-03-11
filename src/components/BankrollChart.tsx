@@ -16,8 +16,7 @@ function parseDateToISO(dateStr: string): string {
   return `${y}-${m}-${d}`;
 }
 
-export function BankrollChart({ bets, initialBank = 0 }: BankrollChartProps) {
-  const [selectedMonth, setSelectedMonth] = useState<string>("all");
+export function BankrollChart({ bets, initialBank = 0, selectedMonth, onMonthChange }: BankrollChartProps) {
 
   const availableMonths = useMemo(() => {
     const months = new Set<string>();
