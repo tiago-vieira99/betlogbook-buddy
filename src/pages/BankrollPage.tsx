@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useBets } from "@/hooks/useBets";
 import { useBankrolls } from "@/hooks/useBankrolls";
@@ -8,6 +9,7 @@ import { BankrollChart } from "@/components/BankrollChart";
 import { BankrollStats } from "@/components/BankrollStats";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { computeStatsFromBets } from "@/utils/computeStats";
 
 const BankrollPage = () => {
   const { id } = useParams<{ id: string }>();

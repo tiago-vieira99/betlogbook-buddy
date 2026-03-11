@@ -83,7 +83,7 @@ export function BankrollChart({ bets, initialBank = 0, selectedMonth, onMonthCha
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-foreground">Bankroll Evolution</h3>
         {availableMonths.length > 1 && (
-          <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+          <Select value={selectedMonth} onValueChange={onMonthChange}>
             <SelectTrigger className="w-[160px] h-8 text-xs">
               <SelectValue placeholder="All time" />
             </SelectTrigger>
