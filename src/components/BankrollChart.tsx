@@ -24,7 +24,7 @@ export function BankrollChart({ bets, initialBank = 0, selectedMonth, onMonthCha
       const iso = parseDateToISO(b.date);
       months.add(iso.slice(0, 7));
     });
-    return Array.from(months).sort();
+    return Array.from(months).sort().reverse();
   }, [bets]);
 
   const data = useMemo(() => {
