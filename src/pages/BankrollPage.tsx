@@ -48,6 +48,21 @@ const BankrollPage = () => {
 
   const currentBank = bankroll.initialValue + bankroll.balance;
 
+  const filteredStats = useMemo(
+    () => computeStatsFromBets(bets, bankroll, selectedMonth),
+    [bets, bankroll, selectedMonth]
+  );
+
+  const filteredOngoing = useMemo(() => {
+    if (selectedMonth === "all") return bets.filter(b => b.status === "ONGOING").length;
+    return bets.filter(b => {
+      if (b.status !== "ONGOING") return false;
+      const [d, m, y] = b.date.split("/");
+      const iso = `${y}-${m}`;
+      return iso === selectedMonth;
+    }).length;
+  }, [bets, selectedMonth]);
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border">
@@ -66,9 +81,9 @@ const BankrollPage = () => {
       </header>
 
       <main className="container max-w-6xl mx-auto px-4 py-6 space-y-6">
-        <StatsCards bankroll={bankroll} ongoing={bets.filter(b => b.status === "ONGOING").length} />
-        <BankrollStats bankroll={bankroll} />
-        <BankrollChart bets={bets} initialBank={bankroll.initialValue} />
+        <StatsCards bankroll={filteredStats} ongoing={filteredOngoing} />
+        <BankrollStats bankroll={filteredStats} />
+        <BankrollChart bets={bets} initialBank={bankroll.initialValue} selectedMonth={selectedMonth} onMonthChange={setSelectedMonth} />
 
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-foreground">Bets</h2>
