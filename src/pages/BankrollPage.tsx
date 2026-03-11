@@ -35,21 +35,8 @@ const BankrollPage = () => {
     await refreshBankroll(bankrollId);
   };
 
-  if (!bankroll) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <p className="text-muted-foreground text-lg">Bankroll not found.</p>
-          <Button variant="outline" onClick={() => navigate("/")}>Go Home</Button>
-        </div>
-      </div>
-    );
-  }
-
-  const currentBank = bankroll.initialValue + bankroll.balance;
-
   const filteredStats = useMemo(
-    () => computeStatsFromBets(bets, bankroll, selectedMonth),
+    () => bankroll ? computeStatsFromBets(bets, bankroll, selectedMonth) : null,
     [bets, bankroll, selectedMonth]
   );
 
@@ -62,6 +49,19 @@ const BankrollPage = () => {
       return iso === selectedMonth;
     }).length;
   }, [bets, selectedMonth]);
+
+  if (!bankroll || !filteredStats) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <p className="text-muted-foreground text-lg">Bankroll not found.</p>
+          <Button variant="outline" onClick={() => navigate("/")}>Go Home</Button>
+        </div>
+      </div>
+    );
+  }
+
+  const currentBank = bankroll.initialValue + bankroll.balance;
 
   return (
     <div className="min-h-screen bg-background">
