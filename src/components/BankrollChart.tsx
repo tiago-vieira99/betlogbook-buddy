@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Bet } from "@/types/bet";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -6,6 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 interface BankrollChartProps {
   bets: Bet[];
   initialBank?: number;
+  selectedMonth: string;
+  onMonthChange: (month: string) => void;
 }
 
 // Parse DD/MM/YYYY to sortable YYYY-MM-DD
@@ -14,8 +16,7 @@ function parseDateToISO(dateStr: string): string {
   return `${y}-${m}-${d}`;
 }
 
-export function BankrollChart({ bets, initialBank = 0 }: BankrollChartProps) {
-  const [selectedMonth, setSelectedMonth] = useState<string>("all");
+export function BankrollChart({ bets, initialBank = 0, selectedMonth, onMonthChange }: BankrollChartProps) {
 
   const availableMonths = useMemo(() => {
     const months = new Set<string>();
@@ -82,7 +83,7 @@ export function BankrollChart({ bets, initialBank = 0 }: BankrollChartProps) {
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-foreground">Bankroll Evolution</h3>
         {availableMonths.length > 1 && (
-          <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+          <Select value={selectedMonth} onValueChange={onMonthChange}>
             <SelectTrigger className="w-[160px] h-8 text-xs">
               <SelectValue placeholder="All time" />
             </SelectTrigger>

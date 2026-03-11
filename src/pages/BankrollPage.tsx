@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useBets } from "@/hooks/useBets";
 import { useBankrolls } from "@/hooks/useBankrolls";
@@ -8,6 +9,7 @@ import { BankrollChart } from "@/components/BankrollChart";
 import { BankrollStats } from "@/components/BankrollStats";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { computeStatsFromBets } from "@/utils/computeStats";
 
 const BankrollPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +18,7 @@ const BankrollPage = () => {
   const { getBankroll, refreshBankroll } = useBankrolls();
   const bankroll = getBankroll(bankrollId);
   const { bets, addBet, updateBet, deleteBet } = useBets(bankrollId);
+  const [selectedMonth, setSelectedMonth] = useState("all");
 
   const handleAddBet = async (bet: Parameters<typeof addBet>[0]) => {
     await addBet(bet);
@@ -32,7 +35,22 @@ const BankrollPage = () => {
     await refreshBankroll(bankrollId);
   };
 
-  if (!bankroll) {
+  const filteredStats = useMemo(
+    () => bankroll ? computeStatsFromBets(bets, bankroll, selectedMonth) : null,
+    [bets, bankroll, selectedMonth]
+  );
+
+  const filteredOngoing = useMemo(() => {
+    if (selectedMonth === "all") return bets.filter(b => b.status === "ONGOING").length;
+    return bets.filter(b => {
+      if (b.status !== "ONGOING") return false;
+      const [d, m, y] = b.date.split("/");
+      const iso = `${y}-${m}`;
+      return iso === selectedMonth;
+    }).length;
+  }, [bets, selectedMonth]);
+
+  if (!bankroll || !filteredStats) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -63,9 +81,9 @@ const BankrollPage = () => {
       </header>
 
       <main className="container max-w-6xl mx-auto px-4 py-6 space-y-6">
-        <StatsCards bankroll={bankroll} ongoing={bets.filter(b => b.status === "ONGOING").length} />
-        <BankrollStats bankroll={bankroll} />
-        <BankrollChart bets={bets} initialBank={bankroll.initialValue} />
+        <StatsCards bankroll={filteredStats} ongoing={filteredOngoing} />
+        <BankrollStats bankroll={filteredStats} />
+        <BankrollChart bets={bets} initialBank={bankroll.initialValue} selectedMonth={selectedMonth} onMonthChange={setSelectedMonth} />
 
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-foreground">Bets</h2>
