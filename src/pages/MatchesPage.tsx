@@ -7,15 +7,20 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-function getResultColor(ftResult: string, homeTeam: string, awayTeam: string, teamName: string): string {
+function parseDate(d: string): number {
+  const [day, month, year] = d.split("/").map(Number);
+  return new Date(year, month - 1, day).getTime();
+}
+
+function getResultBg(ftResult: string, homeTeam: string, awayTeam: string, teamName: string): string {
   const parts = ftResult.split("-").map((s) => parseInt(s.trim(), 10));
   if (parts.length !== 2 || isNaN(parts[0]) || isNaN(parts[1])) return "";
   const [homeGoals, awayGoals] = parts;
   const isHome = homeTeam.toLowerCase() === teamName.toLowerCase();
-  if (homeGoals === awayGoals) return "text-yellow-500";
+  if (homeGoals === awayGoals) return "bg-yellow-500/30";
   const homeWon = homeGoals > awayGoals;
-  if ((isHome && homeWon) || (!isHome && !homeWon)) return "text-green-500";
-  return "text-red-500";
+  if ((isHome && homeWon) || (!isHome && !homeWon)) return "bg-green-500/30";
+  return "bg-red-500/30";
 }
 
 const MatchesPage = () => {
