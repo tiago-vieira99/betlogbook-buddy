@@ -9,18 +9,27 @@ import { toast } from "sonner";
 
 function parseDate(d: string): number {
   const [day, month, year] = d.split("/").map(Number);
+  if ([day, month, year].some((part) => Number.isNaN(part))) return 0;
   return new Date(year, month - 1, day).getTime();
 }
 
+function isCurrentTeam(matchTeamName: string, teamName: string): boolean {
+  return matchTeamName.trim().toLowerCase() === teamName.trim().toLowerCase();
+}
+
 function getResultBg(ftResult: string, homeTeam: string, awayTeam: string, teamName: string): string {
-  const parts = ftResult.split("-").map((s) => parseInt(s.trim(), 10));
-  if (parts.length !== 2 || isNaN(parts[0]) || isNaN(parts[1])) return "";
+  const parts = ftResult.split(/[-:]/).map((s) => parseInt(s.trim(), 10));
+  if (parts.length !== 2 || Number.isNaN(parts[0]) || Number.isNaN(parts[1])) return "";
+
   const [homeGoals, awayGoals] = parts;
-  const isHome = homeTeam.toLowerCase() === teamName.toLowerCase();
-  if (homeGoals === awayGoals) return "bg-yellow-500/30";
-  const homeWon = homeGoals > awayGoals;
-  if ((isHome && homeWon) || (!isHome && !homeWon)) return "bg-green-500/30";
-  return "bg-red-500/30";
+  const isHome = isCurrentTeam(homeTeam, teamName);
+  const isAway = isCurrentTeam(awayTeam, teamName);
+
+  if (!isHome && !isAway) return "";
+  if (homeGoals === awayGoals) return "bg-ongoing/25";
+
+  const teamWon = (isHome && homeGoals > awayGoals) || (isAway && awayGoals > homeGoals);
+  return teamWon ? "bg-win/25" : "bg-loss/25";
 }
 
 const MatchesPage = () => {
