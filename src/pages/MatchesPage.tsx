@@ -93,7 +93,7 @@ const MatchesPage = () => {
                   <TableCell>{m.homeTeam}</TableCell>
                   <TableCell>{m.awayTeam}</TableCell>
                   <TableCell>{m.htResult}</TableCell>
-                  <TableCell className={`font-semibold ${getResultColor(m.ftResult, m.homeTeam, m.awayTeam, teamName)}`}>
+                  <TableCell className={`font-semibold ${getResultBg(m.ftResult, m.homeTeam, m.awayTeam, teamName)}`}>
                     {m.ftResult}
                   </TableCell>
                   <TableCell>{m.competition}</TableCell>
