@@ -40,7 +40,7 @@ const MatchesPage = () => {
     const season = getSeasonForTeam(beginSeason);
     fetchMatches(teamName, season)
       .then((data) =>
-        setMatches(data.sort((a, b) => new Date(a.matchDate).getTime() - new Date(b.matchDate).getTime()))
+        setMatches(data.sort((a, b) => parseDate(a.matchDate) - parseDate(b.matchDate)))
       )
       .catch((err) => {
         console.error(err);
