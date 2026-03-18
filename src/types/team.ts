@@ -2,7 +2,7 @@ export interface Team {
   id: number;
   name: string;
   country: string;
-  begin_season: string;
+  beginSeason: string;
 }
 
 export interface Match {

@@ -11,6 +11,16 @@ export default defineConfig(({ mode }) => ({
     hmr: {
       overlay: false,
     },
+    proxy: {
+      '/api/bhd': {
+        target: 'http://host.docker.internal:8090',
+        changeOrigin: true,
+      },
+      '/api': {
+        target: 'http://host.docker.internal:8880',
+        changeOrigin: true,
+      },
+    },
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {

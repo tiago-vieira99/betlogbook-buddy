@@ -1,6 +1,6 @@
 import { Team, Match } from "@/types/team";
 
-const API_BASE_URL = "http://host.docker.internal:8090/api/bhd";
+const API_BASE_URL = "/api/bhd";
 
 function getHeaders(): HeadersInit {
   return {

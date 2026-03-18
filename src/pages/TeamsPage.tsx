@@ -59,12 +59,12 @@ const TeamsPage = () => {
                   className="cursor-pointer hover:bg-muted/50"
                   onClick={() =>
                     navigate(`/teams/${team.id}/matches`, {
-                      state: { teamName: team.name, beginSeason: team.begin_season },
+                      state: { teamName: team.name, beginSeason: team.beginSeason },
                     })
                   }
                 >
                   <TableCell className="font-medium">{team.name}</TableCell>
-                  <TableCell>{team.begin_season}</TableCell>
+                  <TableCell>{team.beginSeason}</TableCell>
                   <TableCell>{team.country}</TableCell>
                 </TableRow>
               ))}
