@@ -7,6 +7,17 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
+function getResultColor(ftResult: string, homeTeam: string, awayTeam: string, teamName: string): string {
+  const parts = ftResult.split("-").map((s) => parseInt(s.trim(), 10));
+  if (parts.length !== 2 || isNaN(parts[0]) || isNaN(parts[1])) return "";
+  const [homeGoals, awayGoals] = parts;
+  const isHome = homeTeam.toLowerCase() === teamName.toLowerCase();
+  if (homeGoals === awayGoals) return "text-yellow-500";
+  const homeWon = homeGoals > awayGoals;
+  if ((isHome && homeWon) || (!isHome && !homeWon)) return "text-green-500";
+  return "text-red-500";
+}
+
 const MatchesPage = () => {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,7 +34,9 @@ const MatchesPage = () => {
     }
     const season = getSeasonForTeam(beginSeason);
     fetchMatches(teamName, season)
-      .then(setMatches)
+      .then((data) =>
+        setMatches(data.sort((a, b) => new Date(a.matchDate).getTime() - new Date(b.matchDate).getTime()))
+      )
       .catch((err) => {
         console.error(err);
         toast.error("Failed to load matches");
@@ -75,7 +88,9 @@ const MatchesPage = () => {
                   <TableCell>{m.homeTeam}</TableCell>
                   <TableCell>{m.awayTeam}</TableCell>
                   <TableCell>{m.htResult}</TableCell>
-                  <TableCell>{m.ftResult}</TableCell>
+                  <TableCell className={`font-semibold ${getResultColor(m.ftResult, m.homeTeam, m.awayTeam, teamName)}`}>
+                    {m.ftResult}
+                  </TableCell>
                   <TableCell>{m.competition}</TableCell>
                 </TableRow>
               ))}
