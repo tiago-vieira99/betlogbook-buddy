@@ -96,18 +96,23 @@ const MatchesPage = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {matches.map((m, i) => (
-                <TableRow key={i}>
-                  <TableCell>{m.matchDate}</TableCell>
-                  <TableCell>{m.homeTeam}</TableCell>
-                  <TableCell>{m.awayTeam}</TableCell>
-                  <TableCell>{m.htResult}</TableCell>
-                  <TableCell className={`font-semibold ${getResultBg(m.ftResult, m.homeTeam, m.awayTeam, teamName)}`}>
-                    {m.ftResult}
-                  </TableCell>
-                  <TableCell>{m.competition}</TableCell>
-                </TableRow>
-              ))}
+              {matches.map((m, i) => {
+                const homeIsCurrentTeam = isCurrentTeam(m.homeTeam, teamName);
+                const awayIsCurrentTeam = isCurrentTeam(m.awayTeam, teamName);
+
+                return (
+                  <TableRow key={i}>
+                    <TableCell>{m.matchDate}</TableCell>
+                    <TableCell className={homeIsCurrentTeam ? "font-bold text-foreground" : undefined}>{m.homeTeam}</TableCell>
+                    <TableCell className={awayIsCurrentTeam ? "font-bold text-foreground" : undefined}>{m.awayTeam}</TableCell>
+                    <TableCell>{m.htResult}</TableCell>
+                    <TableCell className={`font-semibold ${getResultBg(m.ftResult, m.homeTeam, m.awayTeam, teamName)}`}>
+                      {m.ftResult}
+                    </TableCell>
+                    <TableCell>{m.competition}</TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         )}
