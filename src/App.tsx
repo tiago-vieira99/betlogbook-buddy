@@ -20,6 +20,8 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/bankroll/:id" element={<BankrollPage />} />
+          <Route path="/teams" element={<TeamsPage />} />
+          <Route path="/teams/:teamId/matches" element={<MatchesPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
