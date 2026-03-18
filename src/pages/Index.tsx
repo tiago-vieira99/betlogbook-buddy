@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Plus, ArrowRight, Wallet, X, ChevronDown } from "lucide-react";
+import { Plus, ArrowRight, Wallet, X, ChevronDown, Users } from "lucide-react";
 import { Bankroll } from "@/types/bet";
 import { NavigateFunction } from "react-router-dom";
 
@@ -78,12 +78,17 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border">
-        <div className="container max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
-          <img src="/favicon.ico" alt="BetLogger" className="w-9 h-9 rounded-lg" />
-          <div>
-            <h1 className="text-lg font-bold text-foreground tracking-tight">BetLogger</h1>
-            <p className="text-xs text-muted-foreground">Track your bets, maximize your edge</p>
+        <div className="container max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img src="/favicon.ico" alt="BetLogger" className="w-9 h-9 rounded-lg" />
+            <div>
+              <h1 className="text-lg font-bold text-foreground tracking-tight">BetLogger</h1>
+              <p className="text-xs text-muted-foreground">Track your bets, maximize your edge</p>
+            </div>
           </div>
+          <Button variant="outline" onClick={() => navigate("/teams")} className="gap-2">
+            <Users className="w-4 h-4" /> Teams
+          </Button>
         </div>
       </header>
 
