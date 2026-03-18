@@ -14,7 +14,7 @@ const TeamsPage = () => {
 
   useEffect(() => {
     fetchTeams()
-      .then(setTeams)
+      .then((data) => setTeams(data.sort((a, b) => a.name.localeCompare(b.name))))
       .catch((err) => {
         console.error(err);
         toast.error("Failed to load teams");
