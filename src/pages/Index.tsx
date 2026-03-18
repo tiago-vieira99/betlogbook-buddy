@@ -79,10 +79,16 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border">
         <div className="container max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
-          <img src="/favicon.ico" alt="BetLogger" className="w-9 h-9 rounded-lg" />
-          <div>
-            <h1 className="text-lg font-bold text-foreground tracking-tight">BetLogger</h1>
-            <p className="text-xs text-muted-foreground">Track your bets, maximize your edge</p>
+          <div className="flex items-center gap-3">
+            <img src="/favicon.ico" alt="BetLogger" className="w-9 h-9 rounded-lg" />
+            <div>
+              <h1 className="text-lg font-bold text-foreground tracking-tight">BetLogger</h1>
+              <p className="text-xs text-muted-foreground">Track your bets, maximize your edge</p>
+            </div>
+          </div>
+          <Button variant="outline" onClick={() => navigate("/teams")} className="gap-2">
+            <Users className="w-4 h-4" /> Teams
+          </Button>
           </div>
         </div>
       </header>
