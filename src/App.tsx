@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import BankrollPage from "./pages/BankrollPage";
 import TeamsPage from "./pages/TeamsPage";
 import MatchesPage from "./pages/MatchesPage";
+import StreaksPage from "./pages/StreaksPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,6 +22,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/bankroll/:id" element={<BankrollPage />} />
           <Route path="/teams" element={<TeamsPage />} />
+          <Route path="/streaks" element={<StreaksPage />} />
           <Route path="/teams/:teamId/matches" element={<MatchesPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

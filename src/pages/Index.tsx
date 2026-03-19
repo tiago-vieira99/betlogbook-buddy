@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Plus, ArrowRight, Wallet, X, ChevronDown, Users } from "lucide-react";
+import { Plus, ArrowRight, Wallet, X, ChevronDown, Users, TrendingUp } from "lucide-react";
 import { Bankroll } from "@/types/bet";
 import { NavigateFunction } from "react-router-dom";
 
@@ -86,9 +86,14 @@ const Index = () => {
               <p className="text-xs text-muted-foreground">Track your bets, maximize your edge</p>
             </div>
           </div>
-          <Button variant="outline" onClick={() => navigate("/teams")} className="gap-2">
-            <Users className="w-4 h-4" /> Teams
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => navigate("/teams")} className="gap-2">
+              <Users className="w-4 h-4" /> Teams
+            </Button>
+            <Button variant="outline" onClick={() => navigate("/streaks")} className="gap-2">
+              <TrendingUp className="w-4 h-4" /> Streaks
+            </Button>
+          </div>
         </div>
       </header>
 
