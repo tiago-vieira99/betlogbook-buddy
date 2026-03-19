@@ -22,6 +22,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/bankroll/:id" element={<BankrollPage />} />
           <Route path="/teams" element={<TeamsPage />} />
+          <Route path="/streaks" element={<StreaksPage />} />
           <Route path="/teams/:teamId/matches" element={<MatchesPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
