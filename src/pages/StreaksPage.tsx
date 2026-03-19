@@ -29,7 +29,7 @@ function getSuccessRate(md: MarketData): number {
 }
 
 function isHighlighted(md: MarketData): boolean {
-  return md.currentStreak > getMaxNegSeq(md);
+  return md.currentStreak >= getMaxNegSeq(md);
 }
 
 function formatNegativeSequence(seq: number[]): string {
