@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => ({
         changeOrigin: true,
       },
       '/api': {
-        target: 'http://host.docker.internal:8880',
+        target: 'http://158.220.112.147:8880',
         changeOrigin: true,
       },
     },
