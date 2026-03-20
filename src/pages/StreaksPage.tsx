@@ -41,7 +41,7 @@ const StreaksPage = () => {
   const [markets, setMarkets] = useState<string[]>([]);
   const [selectedMarket, setSelectedMarket] = useState<string>("");
   const [loading, setLoading] = useState(true);
-  const [sortKey, setSortKey] = useState<SortKey>("currentNegStreak");
+  const [sortKey, setSortKey] = useState<SortKey>("successRate");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [showAll, setShowAll] = useState(false);
   const navigate = useNavigate();
@@ -180,7 +180,7 @@ const StreaksPage = () => {
         <SortableHead label="Position" sortKeyValue="position" />
         <SortableHead label="Current Neg Streak" sortKeyValue="currentNegStreak" />
         <SortableHead label="Matches Played" sortKeyValue="matchesPlayed" />
-        <SortableHead label="Current Season Sequence" sortKeyValue="currentSeasonSequence" />
+        <SortableHead label="Season Neg Sequence" sortKeyValue="currentSeasonSequence" />
         <SortableHead label="Total Greens" sortKeyValue="totalGreens" />
         <SortableHead label="Success Rate" sortKeyValue="successRate" />
       </TableRow>

@@ -35,7 +35,7 @@ function getResultBg(ftResult: string, homeTeam: string, awayTeam: string, teamN
 const MatchesPage = () => {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const navigate = useNavigate();
   const location = useLocation();
   const { teamId } = useParams();
