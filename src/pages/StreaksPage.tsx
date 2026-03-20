@@ -29,7 +29,7 @@ function getSuccessRate(md: MarketData): number {
 }
 
 function isHighlighted(md: MarketData): boolean {
-  return md.currentNegStreak >= getMaxNegSeq(md) && md.currentNegStreak > 0;
+  return md.currentNegStreak > getMaxNegSeq(md) && md.currentNegStreak > 0;
 }
 
 function formatcurrentSeasonSequence(seq: number[]): string {
