@@ -64,12 +64,6 @@ const MatchesPage = () => {
     }),
     [matches, sortDir]
   );
-      .catch((err) => {
-        console.error(err);
-        toast.error("Failed to load matches");
-      })
-      .finally(() => setLoading(false));
-  }, [teamName, beginSeason, navigate]);
 
   return (
     <div className="min-h-screen bg-background">
