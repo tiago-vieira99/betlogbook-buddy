@@ -43,7 +43,7 @@ const TeamsPage = () => {
         </div>
       </header>
 
-      <main className="container max-w-4xl mx-auto px-4 py-8">
+      <main className="container max-w-4xl mx-auto px-4 py-8 space-y-4">
         {loading ? (
           <div className="flex justify-center py-12">
             <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
@@ -51,6 +51,16 @@ const TeamsPage = () => {
         ) : teams.length === 0 ? (
           <p className="text-center text-muted-foreground py-12">No teams found.</p>
         ) : (
+          <>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Search teams..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9"
+              />
+            </div>
           <Table>
             <TableHeader>
               <TableRow>
