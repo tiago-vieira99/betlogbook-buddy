@@ -111,7 +111,7 @@ const MatchesPage = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {matches.map((m, i) => {
+              {sortedMatches.map((m, i) => {
                 const homeIsCurrentTeam = isCurrentTeam(m.homeTeam, teamName);
                 const awayIsCurrentTeam = isCurrentTeam(m.awayTeam, teamName);
 
