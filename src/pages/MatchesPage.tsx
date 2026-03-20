@@ -35,6 +35,7 @@ function getResultBg(ftResult: string, homeTeam: string, awayTeam: string, teamN
 const MatchesPage = () => {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const navigate = useNavigate();
   const location = useLocation();
   const { teamId } = useParams();
@@ -48,9 +49,21 @@ const MatchesPage = () => {
     }
     const season = getSeasonForTeam(beginSeason);
     fetchMatches(teamName, season)
-      .then((data) =>
-        setMatches(data.sort((a, b) => parseDate(a.matchDate) - parseDate(b.matchDate)))
-      )
+      .then((data) => setMatches(data))
+      .catch((err) => {
+        console.error(err);
+        toast.error("Failed to load matches");
+      })
+      .finally(() => setLoading(false));
+  }, [teamName, beginSeason, navigate]);
+
+  const sortedMatches = useMemo(
+    () => [...matches].sort((a, b) => {
+      const cmp = parseDate(a.matchDate) - parseDate(b.matchDate);
+      return sortDir === "asc" ? cmp : -cmp;
+    }),
+    [matches, sortDir]
+  );
       .catch((err) => {
         console.error(err);
         toast.error("Failed to load matches");
