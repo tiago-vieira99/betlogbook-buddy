@@ -1,6 +1,6 @@
 import { StreaksApiResponse, StreakTeam } from "@/types/streak";
 
-const API_BASE_URL = "/api/bhd";
+const API_BASE_URL = "/api";
 
 function getHeaders(): HeadersInit {
   return {
@@ -11,7 +11,7 @@ function getHeaders(): HeadersInit {
 }
 
 export async function fetchStreaks(): Promise<{ teams: StreakTeam[] }> {
-  const res = await fetch(`${API_BASE_URL}/streaks`, {
+  const res = await fetch(`${API_BASE_URL}/betstrat/sync/streaks`, {
     method: "GET",
     headers: getHeaders(),
   });

@@ -1,8 +1,8 @@
 export interface MarketData {
-  currentStreak: number;
+  currentNegStreak: number;
   matchesPlayed: number;
   totalGreens: number;
-  negativeSequence: number[];
+  currentSeasonSequence: number[];
 }
 
 export interface RawTeamData {

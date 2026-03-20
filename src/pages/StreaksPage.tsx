@@ -8,19 +8,19 @@ import { ArrowLeft, Loader2, ArrowUpDown, ChevronDown, ChevronUp } from "lucide-
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-type SortKey = "name" | "position" | "currentStreak" | "matchesPlayed" | "negativeSequence" | "totalGreens" | "successRate";
+type SortKey = "name" | "position" | "currentNegStreak" | "matchesPlayed" | "currentSeasonSequence" | "totalGreens" | "successRate";
 type SortDir = "asc" | "desc";
 
 function getMarketData(team: StreakTeam, market: string): MarketData | null {
   const data = team[market];
-  if (data && typeof data === "object" && "currentStreak" in data) {
+  if (data && typeof data === "object" && "currentNegStreak" in data) {
     return data as MarketData;
   }
   return null;
 }
 
 function getMaxNegSeq(md: MarketData): number {
-  return Math.max(...md.negativeSequence.filter(n => n >= 0), 0);
+  return Math.max(...md.currentSeasonSequence.filter(n => n >= 0), 0);
 }
 
 function getSuccessRate(md: MarketData): number {
@@ -29,10 +29,10 @@ function getSuccessRate(md: MarketData): number {
 }
 
 function isHighlighted(md: MarketData): boolean {
-  return md.currentStreak >= getMaxNegSeq(md);
+  return md.currentNegStreak >= getMaxNegSeq(md) && md.currentNegStreak > 0;
 }
 
-function formatNegativeSequence(seq: number[]): string {
+function formatcurrentSeasonSequence(seq: number[]): string {
   return seq.filter(n => n >= 0).join(", ");
 }
 
@@ -41,7 +41,7 @@ const StreaksPage = () => {
   const [markets, setMarkets] = useState<string[]>([]);
   const [selectedMarket, setSelectedMarket] = useState<string>("");
   const [loading, setLoading] = useState(true);
-  const [sortKey, setSortKey] = useState<SortKey>("currentStreak");
+  const [sortKey, setSortKey] = useState<SortKey>("currentNegStreak");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [showAll, setShowAll] = useState(false);
   const navigate = useNavigate();
@@ -56,7 +56,7 @@ const StreaksPage = () => {
           for (const key of Object.keys(team)) {
             if (!knownKeys.has(key) && !marketKeys.includes(key)) {
               const val = team[key];
-              if (val && typeof val === "object" && "currentStreak" in (val as any)) {
+              if (val && typeof val === "object" && "currentNegStreak" in (val as any)) {
                 marketKeys.push(key);
               }
             }
@@ -102,13 +102,13 @@ const StreaksPage = () => {
         case "position":
           cmp = a.position - b.position;
           break;
-        case "currentStreak":
-          cmp = mdA.currentStreak - mdB.currentStreak;
+        case "currentNegStreak":
+          cmp = mdA.currentNegStreak - mdB.currentNegStreak;
           break;
         case "matchesPlayed":
           cmp = mdA.matchesPlayed - mdB.matchesPlayed;
           break;
-        case "negativeSequence":
+        case "currentSeasonSequence":
           cmp = getMaxNegSeq(mdA) - getMaxNegSeq(mdB);
           break;
         case "totalGreens":
@@ -164,9 +164,9 @@ const StreaksPage = () => {
       <TableRow key={team.name}>
         <TableCell className="font-medium">{team.name}</TableCell>
         <TableCell>{team.position}</TableCell>
-        <TableCell className="font-semibold">{md.currentStreak}</TableCell>
+        <TableCell className="font-semibold">{md.currentNegStreak}</TableCell>
         <TableCell>{md.matchesPlayed}</TableCell>
-        <TableCell className="font-mono text-xs">{formatNegativeSequence(md.negativeSequence)}</TableCell>
+        <TableCell className="font-mono text-xs">{formatcurrentSeasonSequence(md.currentSeasonSequence)}</TableCell>
         <TableCell>{md.totalGreens}</TableCell>
         <TableCell className="font-semibold">{rate.toFixed(1)}%</TableCell>
       </TableRow>
@@ -178,9 +178,9 @@ const StreaksPage = () => {
       <TableRow>
         <SortableHead label="Team" sortKeyValue="name" />
         <SortableHead label="Position" sortKeyValue="position" />
-        <SortableHead label="Current Streak" sortKeyValue="currentStreak" />
+        <SortableHead label="Current Neg Streak" sortKeyValue="currentNegStreak" />
         <SortableHead label="Matches Played" sortKeyValue="matchesPlayed" />
-        <SortableHead label="Neg. Sequence" sortKeyValue="negativeSequence" />
+        <SortableHead label="Current Season Sequence" sortKeyValue="currentSeasonSequence" />
         <SortableHead label="Total Greens" sortKeyValue="totalGreens" />
         <SortableHead label="Success Rate" sortKeyValue="successRate" />
       </TableRow>
