@@ -5,6 +5,12 @@ export interface MarketData {
   negativeSequence: number[];
 }
 
+export interface RawTeamData {
+  teamID: number;
+  position: number;
+  [market: string]: number | MarketData;
+}
+
 export interface StreakTeam {
   name: string;
   teamID: number;
@@ -12,6 +18,5 @@ export interface StreakTeam {
   [market: string]: string | number | MarketData;
 }
 
-export interface StreaksResponse {
-  teams: StreakTeam[];
-}
+// API returns { "TeamName": { teamID, position, wins: {...}, noWins: {...}, ... } }
+export type StreaksApiResponse = Record<string, RawTeamData>;

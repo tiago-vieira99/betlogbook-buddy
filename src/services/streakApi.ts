@@ -1,4 +1,4 @@
-import { StreaksResponse } from "@/types/streak";
+import { StreaksApiResponse, StreakTeam } from "@/types/streak";
 
 const API_BASE_URL = "/api/bhd";
 
@@ -10,11 +10,18 @@ function getHeaders(): HeadersInit {
   };
 }
 
-export async function fetchStreaks(): Promise<StreaksResponse> {
+export async function fetchStreaks(): Promise<{ teams: StreakTeam[] }> {
   const res = await fetch(`${API_BASE_URL}/streaks`, {
     method: "GET",
     headers: getHeaders(),
   });
   if (!res.ok) throw new Error("Failed to fetch streaks");
-  return res.json();
+  const raw: StreaksApiResponse = await res.json();
+
+  const teams: StreakTeam[] = Object.entries(raw).map(([name, data]) => {
+    const { teamID, position, ...markets } = data;
+    return { name, teamID, position, ...markets } as StreakTeam;
+  });
+
+  return { teams };
 }
