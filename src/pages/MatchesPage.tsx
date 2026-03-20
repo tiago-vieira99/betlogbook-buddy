@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { fetchMatches, getSeasonForTeam } from "@/services/teamApi";
 import { Match } from "@/types/team";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -35,6 +35,7 @@ function getResultBg(ftResult: string, homeTeam: string, awayTeam: string, teamN
 const MatchesPage = () => {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const navigate = useNavigate();
   const location = useLocation();
   const { teamId } = useParams();
@@ -48,15 +49,21 @@ const MatchesPage = () => {
     }
     const season = getSeasonForTeam(beginSeason);
     fetchMatches(teamName, season)
-      .then((data) =>
-        setMatches(data.sort((a, b) => parseDate(a.matchDate) - parseDate(b.matchDate)))
-      )
+      .then((data) => setMatches(data))
       .catch((err) => {
         console.error(err);
         toast.error("Failed to load matches");
       })
       .finally(() => setLoading(false));
   }, [teamName, beginSeason, navigate]);
+
+  const sortedMatches = useMemo(
+    () => [...matches].sort((a, b) => {
+      const cmp = parseDate(a.matchDate) - parseDate(b.matchDate);
+      return sortDir === "asc" ? cmp : -cmp;
+    }),
+    [matches, sortDir]
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -87,7 +94,15 @@ const MatchesPage = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Date</TableHead>
+                <TableHead
+                  className="cursor-pointer select-none hover:text-foreground transition-colors"
+                  onClick={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}
+                >
+                  <span className="inline-flex items-center gap-1">
+                    Date
+                    <ArrowUpDown className="w-3 h-3 text-primary" />
+                  </span>
+                </TableHead>
                 <TableHead>Home Team</TableHead>
                 <TableHead>Away Team</TableHead>
                 <TableHead>HT Result</TableHead>
@@ -96,7 +111,7 @@ const MatchesPage = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {matches.map((m, i) => {
+              {sortedMatches.map((m, i) => {
                 const homeIsCurrentTeam = isCurrentTeam(m.homeTeam, teamName);
                 const awayIsCurrentTeam = isCurrentTeam(m.awayTeam, teamName);
 
