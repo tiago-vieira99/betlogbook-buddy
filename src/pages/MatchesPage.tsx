@@ -94,7 +94,15 @@ const MatchesPage = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Date</TableHead>
+                <TableHead
+                  className="cursor-pointer select-none hover:text-foreground transition-colors"
+                  onClick={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}
+                >
+                  <span className="inline-flex items-center gap-1">
+                    Date
+                    <ArrowUpDown className="w-3 h-3 text-primary" />
+                  </span>
+                </TableHead>
                 <TableHead>Home Team</TableHead>
                 <TableHead>Away Team</TableHead>
                 <TableHead>HT Result</TableHead>
