@@ -61,32 +61,33 @@ const TeamsPage = () => {
                 className="pl-9"
               />
             </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Team</TableHead>
-                <TableHead>Begin Season</TableHead>
-                <TableHead>Country</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {teams.map((team) => (
-                <TableRow
-                  key={team.id}
-                  className="cursor-pointer hover:bg-muted/50"
-                  onClick={() =>
-                    navigate(`/teams/${team.id}/matches`, {
-                      state: { teamName: team.name, beginSeason: team.beginSeason },
-                    })
-                  }
-                >
-                  <TableCell className="font-medium">{team.name}</TableCell>
-                  <TableCell>{team.beginSeason}</TableCell>
-                  <TableCell>{team.country}</TableCell>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Team</TableHead>
+                  <TableHead>Begin Season</TableHead>
+                  <TableHead>Country</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {filteredTeams.map((team) => (
+                  <TableRow
+                    key={team.id}
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() =>
+                      navigate(`/teams/${team.id}/matches`, {
+                        state: { teamName: team.name, beginSeason: team.beginSeason },
+                      })
+                    }
+                  >
+                    <TableCell className="font-medium">{team.name}</TableCell>
+                    <TableCell>{team.beginSeason}</TableCell>
+                    <TableCell>{team.country}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </>
         )}
       </main>
     </div>
