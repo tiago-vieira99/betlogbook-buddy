@@ -1,16 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchTeams } from "@/services/teamApi";
 import { Team } from "@/types/team";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
 const TeamsPage = () => {
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
+
+  const filteredTeams = useMemo(
+    () => teams.filter((t) => t.name.toLowerCase().includes(search.toLowerCase())),
+    [teams, search]
+  );
 
   useEffect(() => {
     fetchTeams()
