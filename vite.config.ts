@@ -1,8 +1,10 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
+import { componentTagger } from "lovable-tagger";
 
-export default defineConfig({
+// https://vitejs.dev/config/
+export default defineConfig(({ mode }) => ({
   server: {
     host: "0.0.0.0",
     port: 5000,
@@ -10,11 +12,21 @@ export default defineConfig({
     hmr: {
       overlay: false,
     },
+    proxy: {
+      '/api/bhd': {
+        target: 'http://host.docker.internal:8090',
+        changeOrigin: true,
+      },
+      '/api': {
+        target: 'http://host.docker.internal:8880',
+        changeOrigin: true,
+      },
+    },
   },
-  plugins: [react()],
+  plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
-});
+}));
