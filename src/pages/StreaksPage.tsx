@@ -1,11 +1,13 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchStreaks } from "@/services/streakApi";
 import { StreakTeam, MarketData } from "@/types/streak";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Loader2, ArrowUpDown, ChevronDown, ChevronUp } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ArrowLeft, Loader2, ArrowUpDown, ChevronDown, ChevronUp, ArrowLeftRight, X, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
 type SortKey = "name" | "position" | "currentNegStreak" | "matchesPlayed" | "currentSeasonSequence" | "totalGreens" | "successRate";
@@ -36,6 +38,95 @@ function formatcurrentSeasonSequence(seq: number[]): string {
   return seq.filter(n => n >= 0).join(", ");
 }
 
+function formatMarketLabel(key: string): string {
+  return key
+    .replace(/([A-Z])/g, " $1")
+    .replace(/_/g, " ")
+    .replace(/^\w/, c => c.toUpperCase())
+    .trim();
+}
+
+// ── Team search input with autocomplete dropdown ──────────────────────────────
+
+function TeamSearchInput({
+  teams,
+  selected,
+  onSelect,
+  placeholder,
+  label,
+}: {
+  teams: StreakTeam[];
+  selected: StreakTeam | null;
+  onSelect: (team: StreakTeam | null) => void;
+  placeholder: string;
+  label: string;
+}) {
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const filtered = useMemo(
+    () => teams.filter(t => t.name.toLowerCase().includes(query.toLowerCase())).slice(0, 8),
+    [teams, query]
+  );
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div className="relative flex-1 min-w-0" ref={ref}>
+      <p className="text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wider">{label}</p>
+      <div className="relative">
+        <Input
+          placeholder={placeholder}
+          value={selected ? selected.name : query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            if (selected) onSelect(null);
+            setOpen(true);
+          }}
+          onFocus={() => { if (!selected) setOpen(true); }}
+          className={selected ? "border-primary" : ""}
+        />
+        {selected && (
+          <button
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            onClick={() => { onSelect(null); setQuery(""); }}
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+      {open && !selected && filtered.length > 0 && (
+        <div className="absolute top-full left-0 right-0 mt-1 bg-popover border border-border rounded-md shadow-lg z-50 max-h-52 overflow-y-auto">
+          {filtered.map(team => (
+            <button
+              key={team.name}
+              className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors flex items-center justify-between"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                onSelect(team);
+                setQuery("");
+                setOpen(false);
+              }}
+            >
+              <span className="font-medium">{team.name}</span>
+              <span className="text-xs text-muted-foreground">#{team.position}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Main page ─────────────────────────────────────────────────────────────────
+
 const StreaksPage = () => {
   const [teams, setTeams] = useState<StreakTeam[]>([]);
   const [markets, setMarkets] = useState<string[]>([]);
@@ -44,6 +135,12 @@ const StreaksPage = () => {
   const [sortKey, setSortKey] = useState<SortKey>("successRate");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [showAll, setShowAll] = useState(false);
+
+  // compare mode
+  const [compareMode, setCompareMode] = useState(false);
+  const [team1, setTeam1] = useState<StreakTeam | null>(null);
+  const [team2, setTeam2] = useState<StreakTeam | null>(null);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -72,7 +169,6 @@ const StreaksPage = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  // Reset showAll when market changes
   useEffect(() => {
     setShowAll(false);
   }, [selectedMarket]);
@@ -96,27 +192,13 @@ const StreaksPage = () => {
 
       let cmp = 0;
       switch (sortKey) {
-        case "name":
-          cmp = a.name.localeCompare(b.name);
-          break;
-        case "position":
-          cmp = a.position - b.position;
-          break;
-        case "currentNegStreak":
-          cmp = mdA.currentNegStreak - mdB.currentNegStreak;
-          break;
-        case "matchesPlayed":
-          cmp = mdA.matchesPlayed - mdB.matchesPlayed;
-          break;
-        case "currentSeasonSequence":
-          cmp = getMaxNegSeq(mdA) - getMaxNegSeq(mdB);
-          break;
-        case "totalGreens":
-          cmp = mdA.totalGreens - mdB.totalGreens;
-          break;
-        case "successRate":
-          cmp = getSuccessRate(mdA) - getSuccessRate(mdB);
-          break;
+        case "name":          cmp = a.name.localeCompare(b.name); break;
+        case "position":      cmp = a.position - b.position; break;
+        case "currentNegStreak": cmp = mdA.currentNegStreak - mdB.currentNegStreak; break;
+        case "matchesPlayed": cmp = mdA.matchesPlayed - mdB.matchesPlayed; break;
+        case "currentSeasonSequence": cmp = getMaxNegSeq(mdA) - getMaxNegSeq(mdB); break;
+        case "totalGreens":   cmp = mdA.totalGreens - mdB.totalGreens; break;
+        case "successRate":   cmp = getSuccessRate(mdA) - getSuccessRate(mdB); break;
       }
       return sortDir === "asc" ? cmp : -cmp;
     });
@@ -127,22 +209,34 @@ const StreaksPage = () => {
     const r: typeof sortedTeams = [];
     for (const team of sortedTeams) {
       const md = getMarketData(team, selectedMarket);
-      if (md && isHighlighted(md)) {
-        h.push(team);
-      } else {
-        r.push(team);
-      }
+      if (md && isHighlighted(md)) h.push(team);
+      else r.push(team);
     }
     return { highlighted: h, rest: r };
   }, [sortedTeams, selectedMarket]);
 
-  const formatMarketLabel = (key: string) => {
-    return key
-      .replace(/([A-Z])/g, " $1")
-      .replace(/_/g, " ")
-      .replace(/^\w/, c => c.toUpperCase())
-      .trim();
-  };
+  // compare: sorted markets — both alert first, then one, then neither
+  const comparedMarkets = useMemo(() => {
+    if (!compareMode || (!team1 && !team2)) return markets;
+    return [...markets].sort((a, b) => {
+      const h1a = team1 ? (getMarketData(team1, a) ? isHighlighted(getMarketData(team1, a)!) : false) : false;
+      const h2a = team2 ? (getMarketData(team2, a) ? isHighlighted(getMarketData(team2, a)!) : false) : false;
+      const h1b = team1 ? (getMarketData(team1, b) ? isHighlighted(getMarketData(team1, b)!) : false) : false;
+      const h2b = team2 ? (getMarketData(team2, b) ? isHighlighted(getMarketData(team2, b)!) : false) : false;
+      const scoreA = (h1a ? 1 : 0) + (h2a ? 1 : 0);
+      const scoreB = (h1b ? 1 : 0) + (h2b ? 1 : 0);
+      return scoreB - scoreA;
+    });
+  }, [compareMode, team1, team2, markets]);
+
+  const team1AlertCount = useMemo(
+    () => team1 ? markets.filter(m => { const md = getMarketData(team1, m); return md && isHighlighted(md); }).length : 0,
+    [team1, markets]
+  );
+  const team2AlertCount = useMemo(
+    () => team2 ? markets.filter(m => { const md = getMarketData(team2, m); return md && isHighlighted(md); }).length : 0,
+    [team2, markets]
+  );
 
   const SortableHead = ({ label, sortKeyValue }: { label: string; sortKeyValue: SortKey }) => (
     <TableHead
@@ -194,10 +288,25 @@ const StreaksPage = () => {
           <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <div>
+          <div className="flex-1">
             <h1 className="text-lg font-bold text-foreground tracking-tight">Streaks</h1>
             <p className="text-xs text-muted-foreground">View team streaks across different markets</p>
           </div>
+          {!loading && markets.length > 0 && (
+            <Button
+              variant={compareMode ? "default" : "outline"}
+              size="sm"
+              className="gap-2 shrink-0"
+              onClick={() => {
+                setCompareMode(prev => !prev);
+                setTeam1(null);
+                setTeam2(null);
+              }}
+            >
+              <ArrowLeftRight className="w-4 h-4" />
+              Compare
+            </Button>
+          )}
         </div>
       </header>
 
@@ -208,7 +317,144 @@ const StreaksPage = () => {
           </div>
         ) : markets.length === 0 ? (
           <p className="text-center text-muted-foreground py-12">No streak data found.</p>
+        ) : compareMode ? (
+          // ── Compare mode ────────────────────────────────────────────────────
+          <div className="space-y-6">
+            {/* Team selectors */}
+            <div className="rounded-lg border border-border bg-card p-4 space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Search and select two teams to compare their streak alerts side by side.
+              </p>
+              <div className="flex gap-4 flex-col sm:flex-row">
+                <TeamSearchInput
+                  teams={teams}
+                  selected={team1}
+                  onSelect={setTeam1}
+                  placeholder="Search team 1..."
+                  label="Team 1"
+                />
+                <div className="hidden sm:flex items-end pb-2 text-muted-foreground">
+                  <ArrowLeftRight className="w-4 h-4" />
+                </div>
+                <TeamSearchInput
+                  teams={teams}
+                  selected={team2}
+                  onSelect={setTeam2}
+                  placeholder="Search team 2..."
+                  label="Team 2"
+                />
+              </div>
+
+              {/* Summary badges */}
+              {(team1 || team2) && (
+                <div className="flex flex-wrap gap-3 pt-1">
+                  {team1 && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-foreground">{team1.name}</span>
+                      <Badge variant={team1AlertCount > 0 ? "default" : "secondary"} className={team1AlertCount > 0 ? "bg-win text-win-foreground" : ""}>
+                        {team1AlertCount} alert{team1AlertCount !== 1 ? "s" : ""}
+                      </Badge>
+                    </div>
+                  )}
+                  {team1 && team2 && <span className="text-muted-foreground text-sm">vs</span>}
+                  {team2 && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-foreground">{team2.name}</span>
+                      <Badge variant={team2AlertCount > 0 ? "default" : "secondary"} className={team2AlertCount > 0 ? "bg-win text-win-foreground" : ""}>
+                        {team2AlertCount} alert{team2AlertCount !== 1 ? "s" : ""}
+                      </Badge>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Comparison table */}
+            {(team1 || team2) ? (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="min-w-[140px]">Market</TableHead>
+                      {team1 && (
+                        <>
+                          <TableHead className="text-center min-w-[80px]">
+                            <span className="block text-xs font-semibold text-foreground truncate max-w-[100px]">{team1.name}</span>
+                            <span className="text-[10px] text-muted-foreground font-normal">Streak</span>
+                          </TableHead>
+                          <TableHead className="text-center min-w-[60px]">
+                            <span className="text-[10px] text-muted-foreground font-normal">Max</span>
+                          </TableHead>
+                          <TableHead className="text-center min-w-[50px]">
+                            <span className="text-[10px] text-muted-foreground font-normal">Alert</span>
+                          </TableHead>
+                        </>
+                      )}
+                      {team2 && (
+                        <>
+                          <TableHead className="text-center min-w-[80px]">
+                            <span className="block text-xs font-semibold text-foreground truncate max-w-[100px]">{team2.name}</span>
+                            <span className="text-[10px] text-muted-foreground font-normal">Streak</span>
+                          </TableHead>
+                          <TableHead className="text-center min-w-[60px]">
+                            <span className="text-[10px] text-muted-foreground font-normal">Max</span>
+                          </TableHead>
+                          <TableHead className="text-center min-w-[50px]">
+                            <span className="text-[10px] text-muted-foreground font-normal">Alert</span>
+                          </TableHead>
+                        </>
+                      )}
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {comparedMarkets.map(market => {
+                      const md1 = team1 ? getMarketData(team1, market) : null;
+                      const md2 = team2 ? getMarketData(team2, market) : null;
+                      const h1 = md1 ? isHighlighted(md1) : false;
+                      const h2 = md2 ? isHighlighted(md2) : false;
+                      const anyAlert = h1 || h2;
+
+                      return (
+                        <TableRow key={market} className={anyAlert ? "bg-win/5" : undefined}>
+                          <TableCell className="font-medium text-sm">{formatMarketLabel(market)}</TableCell>
+                          {team1 && (
+                            <>
+                              <TableCell className={`text-center font-semibold ${h1 ? "text-win" : "text-muted-foreground"}`}>
+                                {md1 ? md1.currentNegStreak : "—"}
+                              </TableCell>
+                              <TableCell className={`text-center text-sm ${h1 ? "text-win" : "text-muted-foreground"}`}>
+                                {md1 ? getMaxNegSeq(md1) : "—"}
+                              </TableCell>
+                              <TableCell className="text-center">
+                                {h1 ? <CheckCircle2 className="w-4 h-4 text-win mx-auto" /> : <span className="text-muted-foreground/40 text-xs">—</span>}
+                              </TableCell>
+                            </>
+                          )}
+                          {team2 && (
+                            <>
+                              <TableCell className={`text-center font-semibold ${h2 ? "text-win" : "text-muted-foreground"}`}>
+                                {md2 ? md2.currentNegStreak : "—"}
+                              </TableCell>
+                              <TableCell className={`text-center text-sm ${h2 ? "text-win" : "text-muted-foreground"}`}>
+                                {md2 ? getMaxNegSeq(md2) : "—"}
+                              </TableCell>
+                              <TableCell className="text-center">
+                                {h2 ? <CheckCircle2 className="w-4 h-4 text-win mx-auto" /> : <span className="text-muted-foreground/40 text-xs">—</span>}
+                              </TableCell>
+                            </>
+                          )}
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            ) : (
+              <p className="text-center text-muted-foreground py-12">Select at least one team above to see the comparison.</p>
+            )}
+          </div>
         ) : (
+          // ── Normal mode ──────────────────────────────────────────────────────
           <>
             <Tabs value={selectedMarket} onValueChange={setSelectedMarket}>
               <TabsList className="flex-wrap h-auto gap-1">
