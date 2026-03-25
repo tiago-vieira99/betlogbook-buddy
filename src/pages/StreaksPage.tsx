@@ -385,6 +385,12 @@ const StreaksPage = () => {
                           <TableHead className="text-center min-w-[60px]">
                             <span className="text-[10px] text-muted-foreground font-normal">Max</span>
                           </TableHead>
+                          <TableHead className="text-center min-w-[120px]">
+                            <span className="text-[10px] text-muted-foreground font-normal">Season Seq</span>
+                          </TableHead>
+                          <TableHead className="text-center min-w-[70px]">
+                            <span className="text-[10px] text-muted-foreground font-normal">Success %</span>
+                          </TableHead>
                           <TableHead className="text-center min-w-[50px]">
                             <span className="text-[10px] text-muted-foreground font-normal">Alert</span>
                           </TableHead>
@@ -398,6 +404,12 @@ const StreaksPage = () => {
                           </TableHead>
                           <TableHead className="text-center min-w-[60px]">
                             <span className="text-[10px] text-muted-foreground font-normal">Max</span>
+                          </TableHead>
+                          <TableHead className="text-center min-w-[120px]">
+                            <span className="text-[10px] text-muted-foreground font-normal">Season Seq</span>
+                          </TableHead>
+                          <TableHead className="text-center min-w-[70px]">
+                            <span className="text-[10px] text-muted-foreground font-normal">Success %</span>
                           </TableHead>
                           <TableHead className="text-center min-w-[50px]">
                             <span className="text-[10px] text-muted-foreground font-normal">Alert</span>
@@ -425,6 +437,12 @@ const StreaksPage = () => {
                               <TableCell className={`text-center text-sm ${h1 ? "text-win" : "text-muted-foreground"}`}>
                                 {md1 ? getMaxNegSeq(md1) : "—"}
                               </TableCell>
+                              <TableCell className="text-center font-mono text-xs text-muted-foreground">
+                                {md1 ? formatcurrentSeasonSequence(md1.currentSeasonSequence) : "—"}
+                              </TableCell>
+                              <TableCell className="text-center text-sm text-muted-foreground">
+                                {md1 ? `${getSuccessRate(md1).toFixed(1)}%` : "—"}
+                              </TableCell>
                               <TableCell className="text-center">
                                 {h1 ? <CheckCircle2 className="w-4 h-4 text-win mx-auto" /> : <span className="text-muted-foreground/40 text-xs">—</span>}
                               </TableCell>
@@ -437,6 +455,12 @@ const StreaksPage = () => {
                               </TableCell>
                               <TableCell className={`text-center text-sm ${h2 ? "text-win" : "text-muted-foreground"}`}>
                                 {md2 ? getMaxNegSeq(md2) : "—"}
+                              </TableCell>
+                              <TableCell className="text-center font-mono text-xs text-muted-foreground">
+                                {md2 ? formatcurrentSeasonSequence(md2.currentSeasonSequence) : "—"}
+                              </TableCell>
+                              <TableCell className="text-center text-sm text-muted-foreground">
+                                {md2 ? `${getSuccessRate(md2).toFixed(1)}%` : "—"}
                               </TableCell>
                               <TableCell className="text-center">
                                 {h2 ? <CheckCircle2 className="w-4 h-4 text-win mx-auto" /> : <span className="text-muted-foreground/40 text-xs">—</span>}
