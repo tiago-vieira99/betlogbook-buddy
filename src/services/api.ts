@@ -1,5 +1,4 @@
 import { Bankroll, Bet } from "@/types/bet";
-import { log } from "console";
 
 // ============================================================
 // 🔧 CONFIGURATION — Edit the base URL to point to your API
