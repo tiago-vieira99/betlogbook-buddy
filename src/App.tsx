@@ -8,6 +8,7 @@ import BankrollPage from "./pages/BankrollPage";
 import TeamsPage from "./pages/TeamsPage";
 import MatchesPage from "./pages/MatchesPage";
 import StreaksPage from "./pages/StreaksPage";
+import InsightsPage from "./pages/InsightsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/teams" element={<TeamsPage />} />
           <Route path="/streaks" element={<StreaksPage />} />
           <Route path="/teams/:teamId/matches" element={<MatchesPage />} />
+          <Route path="/insights" element={<InsightsPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
