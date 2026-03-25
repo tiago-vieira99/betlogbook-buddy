@@ -39,7 +39,10 @@ const MatchesPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { teamId } = useParams();
-  const { teamName, beginSeason } = (location.state as { teamName: string; beginSeason: string }) || {};
+  const searchParams = new URLSearchParams(location.search);
+  const stateData = (location.state as { teamName: string; beginSeason: string }) || {};
+  const teamName = stateData.teamName || searchParams.get("teamName") || "";
+  const beginSeason = stateData.beginSeason || searchParams.get("beginSeason") || "";
 
   useEffect(() => {
     if (!teamName || !beginSeason) {

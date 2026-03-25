@@ -74,11 +74,13 @@ const TeamsPage = () => {
                   <TableRow
                     key={team.id}
                     className="cursor-pointer hover:bg-muted/50"
-                    onClick={() =>
-                      navigate(`/teams/${team.id}/matches`, {
-                        state: { teamName: team.name, beginSeason: team.beginSeason },
-                      })
-                    }
+                    onClick={() => {
+                      const params = new URLSearchParams({
+                        teamName: team.name,
+                        beginSeason: team.beginSeason,
+                      });
+                      window.open(`/teams/${team.id}/matches?${params}`, "_blank");
+                    }}
                   >
                     <TableCell className="font-medium">{team.name}</TableCell>
                     <TableCell>{team.beginSeason}</TableCell>
