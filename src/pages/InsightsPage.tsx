@@ -366,7 +366,7 @@ const InsightsPage = () => {
                                         team1: match.homeTeam,
                                         team2: match.awayTeam,
                                       });
-                                      navigate(`/streaks?${params}`);
+                                      window.open(`/streaks?${params}`, "_blank");
                                     }}
                                   >
                                     <ArrowLeftRight className="w-4 h-4" />
