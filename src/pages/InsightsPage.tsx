@@ -97,7 +97,12 @@ function TeamHistoryPanel({ teamName, history }: { teamName: string; history: Hi
               <span className="text-muted-foreground mx-1">vs</span>
               <span className={!isHome ? "font-semibold" : ""}>{m.awayTeam}</span>
             </span>
-            <span className="font-mono text-muted-foreground shrink-0 w-8 text-right">{m.ftResult !== "null" ? m.ftResult : "—"}</span>
+            <span className="font-mono text-muted-foreground shrink-0 text-right whitespace-nowrap">
+              {m.htResult !== "null" ? (
+                <span className="opacity-60 mr-1">({m.htResult})</span>
+              ) : null}
+              {m.ftResult !== "null" ? m.ftResult : "—"}
+            </span>
             <span className={`font-bold w-4 text-center shrink-0 ${resultColor}`}>{resultLabel}</span>
           </div>
         );
