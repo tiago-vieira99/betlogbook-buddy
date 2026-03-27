@@ -35,12 +35,8 @@ function getAlertCount(team: StreakTeam, markets: string[]): number {
   }).length;
 }
 
-// Flexible team name matching to handle slight name differences across APIs
-// e.g. "Moreirense FC" vs "Moreirense", "SL Benfica" vs "Benfica"
 function namesMatch(matchName: string, streakName: string): boolean {
-  const a = matchName.toLowerCase().trim();
-  const b = streakName.toLowerCase().trim();
-  return a === b || a.includes(b) || b.includes(a);
+  return matchName.trim().toLowerCase() === streakName.trim().toLowerCase();
 }
 
 // ── Date helpers ──────────────────────────────────────────────────────────────
