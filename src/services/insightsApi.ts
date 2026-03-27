@@ -10,24 +10,24 @@ function getHeaders(): HeadersInit {
   };
 }
 
-// Cache the promise so concurrent callers share one in-flight request,
-// and subsequent navigations to this page resolve instantly from cache.
+const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
 let cache: Promise<UpcomingMatch[]> | null = null;
+let cacheTimestamp = 0;
 
 export async function fetchUpcomingMatches(): Promise<UpcomingMatch[]> {
-  if (!cache) {
-    cache = fetch(`${API_BASE_URL}/upcomming-matches`, {
-      method: "GET",
-      headers: getHeaders(),
+  if (cache && Date.now() - cacheTimestamp < CACHE_TTL_MS) return cache;
+  cacheTimestamp = Date.now();
+  cache = fetch(`${API_BASE_URL}/upcomming-matches`, {
+    method: "GET",
+    headers: getHeaders(),
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("Failed to fetch upcoming matches");
+      return res.json() as Promise<UpcomingMatch[]>;
     })
-      .then(res => {
-        if (!res.ok) throw new Error("Failed to fetch upcoming matches");
-        return res.json() as Promise<UpcomingMatch[]>;
-      })
-      .catch(err => {
-        cache = null; // allow retry on next call
-        throw err;
-      });
-  }
+    .catch(err => {
+      cache = null;
+      throw err;
+    });
   return cache;
 }
