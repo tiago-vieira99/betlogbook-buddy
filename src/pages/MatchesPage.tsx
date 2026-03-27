@@ -4,6 +4,7 @@ import { fetchMatches, getSeasonForTeam } from "@/services/teamApi";
 import { Match } from "@/types/team";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { ArrowLeft, Loader2, ArrowUpDown } from "lucide-react";
+import { NavButtons } from "@/components/NavButtons";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
@@ -75,7 +76,7 @@ const MatchesPage = () => {
           <Button variant="ghost" size="icon" onClick={() => navigate("/teams")}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <div>
+          <div className="flex-1">
             <h1 className="text-lg font-bold text-foreground tracking-tight">
               {teamName ?? "Matches"}
             </h1>
@@ -83,6 +84,7 @@ const MatchesPage = () => {
               Season {beginSeason ? getSeasonForTeam(beginSeason) : ""}
             </p>
           </div>
+          <NavButtons />
         </div>
       </header>
 

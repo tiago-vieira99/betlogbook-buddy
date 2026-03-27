@@ -7,6 +7,7 @@ import { ArrowLeft, Loader2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { NavButtons } from "@/components/NavButtons";
 
 const TeamsPage = () => {
   const [teams, setTeams] = useState<Team[]>([]);
@@ -36,10 +37,11 @@ const TeamsPage = () => {
           <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <div>
+          <div className="flex-1">
             <h1 className="text-lg font-bold text-foreground tracking-tight">Teams</h1>
             <p className="text-xs text-muted-foreground">Browse teams and view their matches</p>
           </div>
+          <NavButtons />
         </div>
       </header>
 

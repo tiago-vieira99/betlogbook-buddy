@@ -7,6 +7,7 @@ import { UpcomingMatch } from "@/types/insights";
 import { Match } from "@/types/team";
 import { StreakTeam, MarketData } from "@/types/streak";
 import { ArrowLeft, Loader2, Search, Trophy, CalendarDays, CheckCircle2, ChevronDown, ChevronUp, ArrowLeftRight } from "lucide-react";
+import { NavButtons } from "@/components/NavButtons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -233,6 +234,7 @@ const InsightsPage = () => {
               {totalMatches} match{totalMatches !== 1 ? "es" : ""}
             </Badge>
           )}
+          <NavButtons />
         </div>
       </header>
 
