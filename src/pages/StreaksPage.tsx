@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { fetchStreaks } from "@/services/streakApi";
 import { StreakTeam, MarketData } from "@/types/streak";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
@@ -183,6 +183,8 @@ const StreaksPage = () => {
   const [expandedTeam, setExpandedTeam] = useState<string | null>(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const [urlParamsApplied, setUrlParamsApplied] = useState(false);
 
   const switchMode = (next: Mode) => {
     setMode(prev => prev === next ? "normal" : next);
@@ -220,6 +222,26 @@ const StreaksPage = () => {
   useEffect(() => {
     setShowAll(false);
   }, [selectedMarket]);
+
+  // Auto-activate compare mode + pre-select teams from URL params (deep-link from Insights)
+  useEffect(() => {
+    if (teams.length === 0 || urlParamsApplied) return;
+    const params = new URLSearchParams(location.search);
+    if (params.get("mode") === "compare") {
+      setMode("compare");
+      const t1Name = params.get("team1");
+      const t2Name = params.get("team2");
+      if (t1Name) {
+        const t = teams.find(t => t.name.toLowerCase() === t1Name.toLowerCase());
+        if (t) setTeam1(t);
+      }
+      if (t2Name) {
+        const t = teams.find(t => t.name.toLowerCase() === t2Name.toLowerCase());
+        if (t) setTeam2(t);
+      }
+    }
+    setUrlParamsApplied(true);
+  }, [teams, urlParamsApplied, location.search]);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
