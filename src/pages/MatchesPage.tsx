@@ -41,7 +41,7 @@ const MatchesPage = () => {
   const location = useLocation();
   const { teamId } = useParams();
   const searchParams = new URLSearchParams(location.search);
-  const stateData = (location.state as { teamName: string; beginSeason: string }) || {};
+  const stateData = (location.state || {}) as Record<string, string>;
   const teamName = stateData.teamName || searchParams.get("teamName") || "";
   const beginSeason = stateData.beginSeason || searchParams.get("beginSeason") || "";
 
