@@ -121,6 +121,7 @@ const InsightsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [expandedMatchId, setExpandedMatchId] = useState<number | null>(null);
   const [historyCache, setHistoryCache] = useState<Record<string, HistoryEntry>>({});
   const fetchingRef = useRef<Set<string>>(new Set());
@@ -161,9 +162,25 @@ const InsightsPage = () => {
   const findAlertingTeam = (name: string) =>
     alertingTeams.find(({ team }) => namesMatch(name, team.name));
 
+  // Matches that have at least one alerting team
+  const alertedMatches = useMemo(() => {
+    return matches.filter(m => findAlertingTeam(m.homeTeam) || findAlertingTeam(m.awayTeam));
+  }, [matches, alertingTeams]);
+
+  // Available days sorted by date
+  const availableDays = useMemo(() => {
+    const daySet = new Set(alertedMatches.map(m => m.matchDate));
+    return [...daySet].sort((a, b) => parseMatchDate(a) - parseMatchDate(b));
+  }, [alertedMatches]);
+
+  // Auto-select earliest day
+  const activeDay = selectedDay && availableDays.includes(selectedDay)
+    ? selectedDay
+    : availableDays[0] ?? null;
+
   const filteredMatches = useMemo(() => {
-    return matches.filter(m => {
-      if (!findAlertingTeam(m.homeTeam) && !findAlertingTeam(m.awayTeam)) return false;
+    return alertedMatches.filter(m => {
+      if (activeDay && m.matchDate !== activeDay) return false;
       const q = search.toLowerCase();
       if (!q) return true;
       return (
@@ -172,7 +189,7 @@ const InsightsPage = () => {
         m.competition.toLowerCase().includes(q)
       );
     });
-  }, [matches, alertingTeams, search]);
+  }, [alertedMatches, activeDay, search]);
 
   const grouped = useMemo(() => {
     const map: Record<string, UpcomingMatch[]> = {};
@@ -252,6 +269,23 @@ const InsightsPage = () => {
           </p>
         ) : (
           <>
+            {/* Day filter buttons */}
+            {availableDays.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {availableDays.map(day => (
+                  <Button
+                    key={day}
+                    variant={activeDay === day ? "default" : "outline"}
+                    size="sm"
+                    className="shrink-0"
+                    onClick={() => setSelectedDay(day)}
+                  >
+                    {formatMatchDate(day)}
+                  </Button>
+                ))}
+              </div>
+            )}
+
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
