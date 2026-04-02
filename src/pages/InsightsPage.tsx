@@ -121,6 +121,7 @@ const InsightsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [expandedMatchId, setExpandedMatchId] = useState<number | null>(null);
   const [historyCache, setHistoryCache] = useState<Record<string, HistoryEntry>>({});
   const fetchingRef = useRef<Set<string>>(new Set());
