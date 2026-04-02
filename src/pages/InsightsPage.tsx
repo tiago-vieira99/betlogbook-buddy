@@ -162,9 +162,25 @@ const InsightsPage = () => {
   const findAlertingTeam = (name: string) =>
     alertingTeams.find(({ team }) => namesMatch(name, team.name));
 
+  // Matches that have at least one alerting team
+  const alertedMatches = useMemo(() => {
+    return matches.filter(m => findAlertingTeam(m.homeTeam) || findAlertingTeam(m.awayTeam));
+  }, [matches, alertingTeams]);
+
+  // Available days sorted by date
+  const availableDays = useMemo(() => {
+    const daySet = new Set(alertedMatches.map(m => m.matchDate));
+    return [...daySet].sort((a, b) => parseMatchDate(a) - parseMatchDate(b));
+  }, [alertedMatches]);
+
+  // Auto-select earliest day
+  const activeDay = selectedDay && availableDays.includes(selectedDay)
+    ? selectedDay
+    : availableDays[0] ?? null;
+
   const filteredMatches = useMemo(() => {
-    return matches.filter(m => {
-      if (!findAlertingTeam(m.homeTeam) && !findAlertingTeam(m.awayTeam)) return false;
+    return alertedMatches.filter(m => {
+      if (activeDay && m.matchDate !== activeDay) return false;
       const q = search.toLowerCase();
       if (!q) return true;
       return (
@@ -173,7 +189,7 @@ const InsightsPage = () => {
         m.competition.toLowerCase().includes(q)
       );
     });
-  }, [matches, alertingTeams, search]);
+  }, [alertedMatches, activeDay, search]);
 
   const grouped = useMemo(() => {
     const map: Record<string, UpcomingMatch[]> = {};
