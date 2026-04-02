@@ -374,38 +374,38 @@ const StreaksPage = () => {
             <h1 className="text-lg font-bold text-foreground tracking-tight">Streaks</h1>
             <p className="text-xs text-muted-foreground">View team streaks across different markets</p>
           </div>
-          {!loading && markets.length > 0 && (
-            <div className="flex items-center gap-2 shrink-0">
-              <Button
-                variant={mode === "alerts" ? "default" : "outline"}
-                size="sm"
-                className="gap-2"
-                onClick={() => switchMode("alerts")}
-              >
-                <Bell className="w-4 h-4" />
-                Alerts
-                {mode !== "alerts" && alertTeams.length > 0 && (
-                  <Badge variant="secondary" className="ml-0.5 h-4 px-1 text-[10px]">
-                    {alertTeams.length}
-                  </Badge>
-                )}
-              </Button>
-              <Button
-                variant={mode === "compare" ? "default" : "outline"}
-                size="sm"
-                className="gap-2"
-                onClick={() => switchMode("compare")}
-              >
-                <ArrowLeftRight className="w-4 h-4" />
-                Compare
-              </Button>
-            </div>
-          )}
           <NavButtons />
         </div>
       </header>
 
       <main className="container max-w-5xl mx-auto px-4 py-8 space-y-6">
+        {!loading && markets.length > 0 && (
+          <div className="flex items-center gap-2">
+            <Button
+              variant={mode === "alerts" ? "default" : "outline"}
+              size="sm"
+              className="gap-2"
+              onClick={() => switchMode("alerts")}
+            >
+              <Bell className="w-4 h-4" />
+              Alerts
+              {mode !== "alerts" && alertTeams.length > 0 && (
+                <Badge variant="secondary" className="ml-0.5 h-4 px-1 text-[10px]">
+                  {alertTeams.length}
+                </Badge>
+              )}
+            </Button>
+            <Button
+              variant={mode === "compare" ? "default" : "outline"}
+              size="sm"
+              className="gap-2"
+              onClick={() => switchMode("compare")}
+            >
+              <ArrowLeftRight className="w-4 h-4" />
+              Compare
+            </Button>
+          </div>
+        )}
         {loading ? (
           <div className="flex justify-center py-12">
             <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
