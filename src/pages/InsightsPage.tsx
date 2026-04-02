@@ -269,6 +269,23 @@ const InsightsPage = () => {
           </p>
         ) : (
           <>
+            {/* Day filter buttons */}
+            {availableDays.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {availableDays.map(day => (
+                  <Button
+                    key={day}
+                    variant={activeDay === day ? "default" : "outline"}
+                    size="sm"
+                    className="shrink-0"
+                    onClick={() => setSelectedDay(day)}
+                  >
+                    {formatMatchDate(day)}
+                  </Button>
+                ))}
+              </div>
+            )}
+
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
