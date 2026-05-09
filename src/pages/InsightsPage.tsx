@@ -25,10 +25,6 @@ function formatDayLabel(d: string): string {
   });
 }
 
-function dayId(d: string) {
-  return `day-${d.replace(/\//g, "-")}`;
-}
-
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 const InsightsPage = () => {
@@ -80,10 +76,12 @@ const InsightsPage = () => {
 
   const days = groupedByDay.map(g => g.date);
 
-  function scrollToDay(date: string) {
-    setActiveDay(date);
-    document.getElementById(dayId(date))?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
+  // Auto-select the first (earliest) day when data loads
+  useEffect(() => {
+    if (days.length > 0 && !activeDay) setActiveDay(days[0]);
+  }, [days.length]);
+
+  const selectedGroup = groupedByDay.find(g => g.date === activeDay) ?? groupedByDay[0];
 
   return (
     <div className="min-h-screen bg-background">
@@ -140,59 +138,42 @@ const InsightsPage = () => {
                       key={date}
                       variant={activeDay === date ? "default" : "outline"}
                       size="sm"
-                      onClick={() => scrollToDay(date)}
+                      onClick={() => setActiveDay(date)}
                     >
                       {formatDayLabel(date)}
                     </Button>
                   ))}
                 </div>
 
-                {/* Day sections */}
-                <div className="space-y-8">
-                  {groupedByDay.map(({ date, competitions }) => (
-                    <div key={date} id={dayId(date)} className="scroll-mt-20 space-y-4">
-                      {/* Day header */}
-                      <div className="flex items-center gap-3">
-                        <CalendarDays className="w-4 h-4 text-primary shrink-0" />
-                        <h2 className="font-bold text-foreground">{formatDayLabel(date)}</h2>
-                        <span className="text-xs text-muted-foreground">
-                          {competitions.reduce((sum, c) => sum + c.matches.length, 0)} matches
-                        </span>
-                      </div>
-
-                      {/* Competition groups within this day */}
-                      <div className="space-y-3 pl-0">
-                        {competitions.map(({ competition, matches: compMatches }) => (
-                          <div key={competition} className="rounded-lg border border-border overflow-hidden">
-                            <div className="flex items-center gap-2 px-4 py-2 bg-card border-b border-border">
-                              <Trophy className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                              <span className="text-xs font-semibold text-foreground flex-1">{competition}</span>
-                              <Badge variant="secondary" className="text-xs">
-                                {compMatches.length}
-                              </Badge>
+                {/* Competitions for the selected day */}
+                {selectedGroup && (
+                  <div className="space-y-3">
+                    {selectedGroup.competitions.map(({ competition, matches: compMatches }) => (
+                      <div key={competition} className="rounded-lg border border-border overflow-hidden">
+                        <div className="flex items-center gap-2 px-4 py-2 bg-card border-b border-border">
+                          <Trophy className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                          <span className="text-xs font-semibold text-foreground flex-1">{competition}</span>
+                          <Badge variant="secondary" className="text-xs">{compMatches.length}</Badge>
+                        </div>
+                        <div className="divide-y divide-border">
+                          {compMatches.map((match) => (
+                            <div key={match.id} className="flex items-center gap-4 px-4 py-2.5">
+                              <div className="flex-1 flex items-center justify-end">
+                                <span className="text-sm font-semibold text-foreground">{match.homeTeam}</span>
+                              </div>
+                              <div className="shrink-0 w-8 text-center">
+                                <span className="text-xs text-muted-foreground font-medium">vs</span>
+                              </div>
+                              <div className="flex-1 flex items-center">
+                                <span className="text-sm font-semibold text-foreground">{match.awayTeam}</span>
+                              </div>
                             </div>
-
-                            <div className="divide-y divide-border">
-                              {compMatches.map((match) => (
-                                <div key={match.id} className="flex items-center gap-4 px-4 py-2.5">
-                                  <div className="flex-1 flex items-center justify-end">
-                                    <span className="text-sm font-semibold text-foreground">{match.homeTeam}</span>
-                                  </div>
-                                  <div className="shrink-0 w-8 text-center">
-                                    <span className="text-xs text-muted-foreground font-medium">vs</span>
-                                  </div>
-                                  <div className="flex-1 flex items-center">
-                                    <span className="text-sm font-semibold text-foreground">{match.awayTeam}</span>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </>
             )}
           </>
