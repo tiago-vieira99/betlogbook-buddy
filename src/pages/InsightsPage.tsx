@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchUpcomingMatches } from "@/services/insightsApi";
 import { UpcomingMatch } from "@/types/insights";
-import { ArrowLeft, Loader2, Search, Trophy, CalendarDays } from "lucide-react";
+import { ArrowLeft, Loader2, Search, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -58,17 +58,12 @@ const InsightsPage = () => {
   const grouped = useMemo(() => {
     const map: Record<string, UpcomingMatch[]> = {};
     for (const m of filteredMatches) {
-      if (!map[m.competition]) map[m.competition] = [];
-      map[m.competition].push(m);
+      if (!map[m.matchDate]) map[m.matchDate] = [];
+      map[m.matchDate].push(m);
     }
     return Object.keys(map)
-      .sort((a, b) => a.localeCompare(b))
-      .map(competition => ({
-        competition,
-        matches: [...map[competition]].sort(
-          (a, b) => parseMatchDate(a.matchDate) - parseMatchDate(b.matchDate)
-        ),
-      }));
+      .sort((a, b) => parseMatchDate(a) - parseMatchDate(b))
+      .map(date => ({ date, matches: map[date] }));
   }, [filteredMatches]);
 
   return (
@@ -118,32 +113,25 @@ const InsightsPage = () => {
               <p className="text-center text-muted-foreground py-8">No matches match your search.</p>
             ) : (
               <div className="space-y-6">
-                {grouped.map(({ competition, matches: compMatches }) => (
-                  <div key={competition} className="rounded-lg border border-border overflow-hidden">
+                {grouped.map(({ date, matches: dayMatches }) => (
+                  <div key={date} className="rounded-lg border border-border overflow-hidden">
                     <div className="flex items-center gap-2 px-4 py-3 bg-card border-b border-border">
-                      <Trophy className="w-4 h-4 text-primary shrink-0" />
-                      <span className="font-semibold text-sm text-foreground flex-1">{competition}</span>
+                      <CalendarDays className="w-4 h-4 text-primary shrink-0" />
+                      <span className="font-semibold text-sm text-foreground flex-1">{formatMatchDate(date)}</span>
                       <Badge variant="secondary" className="text-xs">
-                        {compMatches.length} match{compMatches.length !== 1 ? "es" : ""}
+                        {dayMatches.length} match{dayMatches.length !== 1 ? "es" : ""}
                       </Badge>
                     </div>
 
                     <div className="divide-y divide-border">
-                      {compMatches.map((match) => (
-                        <div
-                          key={match.id}
-                          className="flex items-center gap-4 px-4 py-3"
-                        >
-                          <div className="w-24 shrink-0">
-                            <span className="text-xs font-medium text-muted-foreground">
-                              {formatMatchDate(match.matchDate)}
-                            </span>
+                      {dayMatches.map((match) => (
+                        <div key={match.id} className="flex items-center gap-4 px-4 py-3">
+                          <div className="w-32 shrink-0">
+                            <span className="text-xs font-medium text-muted-foreground">{match.competition}</span>
                           </div>
 
                           <div className="flex-1 flex items-center justify-end">
-                            <span className="text-sm font-semibold text-foreground">
-                              {match.homeTeam}
-                            </span>
+                            <span className="text-sm font-semibold text-foreground">{match.homeTeam}</span>
                           </div>
 
                           <div className="shrink-0 w-8 text-center">
@@ -151,9 +139,7 @@ const InsightsPage = () => {
                           </div>
 
                           <div className="flex-1 flex items-center">
-                            <span className="text-sm font-semibold text-foreground">
-                              {match.awayTeam}
-                            </span>
+                            <span className="text-sm font-semibold text-foreground">{match.awayTeam}</span>
                           </div>
                         </div>
                       ))}
