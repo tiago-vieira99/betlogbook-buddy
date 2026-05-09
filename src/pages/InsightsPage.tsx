@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchUpcomingMatches } from "@/services/insightsApi";
 import { UpcomingMatch } from "@/types/insights";
-import { ArrowLeft, Loader2, Search, CalendarDays } from "lucide-react";
+import { ArrowLeft, Loader2, Search, CalendarDays, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -17,12 +17,16 @@ function parseMatchDate(d: string): number {
   return new Date(year, month - 1, day).getTime();
 }
 
-function formatMatchDate(d: string): string {
+function formatDayLabel(d: string): string {
   const [day, month, year] = d.split("/").map(Number);
   if ([day, month, year].some(isNaN)) return d;
   return new Date(year, month - 1, day).toLocaleDateString("en-GB", {
     weekday: "short", day: "numeric", month: "short",
   });
+}
+
+function dayId(d: string) {
+  return `day-${d.replace(/\//g, "-")}`;
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
@@ -32,6 +36,7 @@ const InsightsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [activeDay, setActiveDay] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -55,16 +60,30 @@ const InsightsPage = () => {
     );
   }, [matches, search]);
 
-  const grouped = useMemo(() => {
-    const map: Record<string, UpcomingMatch[]> = {};
+  // Group by day → then by competition within each day
+  const groupedByDay = useMemo(() => {
+    const dayMap: Record<string, Record<string, UpcomingMatch[]>> = {};
     for (const m of filteredMatches) {
-      if (!map[m.matchDate]) map[m.matchDate] = [];
-      map[m.matchDate].push(m);
+      if (!dayMap[m.matchDate]) dayMap[m.matchDate] = {};
+      if (!dayMap[m.matchDate][m.competition]) dayMap[m.matchDate][m.competition] = [];
+      dayMap[m.matchDate][m.competition].push(m);
     }
-    return Object.keys(map)
+    return Object.keys(dayMap)
       .sort((a, b) => parseMatchDate(a) - parseMatchDate(b))
-      .map(date => ({ date, matches: map[date] }));
+      .map(date => ({
+        date,
+        competitions: Object.keys(dayMap[date])
+          .sort((a, b) => a.localeCompare(b))
+          .map(competition => ({ competition, matches: dayMap[date][competition] })),
+      }));
   }, [filteredMatches]);
+
+  const days = groupedByDay.map(g => g.date);
+
+  function scrollToDay(date: string) {
+    setActiveDay(date);
+    document.getElementById(dayId(date))?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -99,6 +118,7 @@ const InsightsPage = () => {
           <p className="text-center text-muted-foreground py-12">No upcoming matches found.</p>
         ) : (
           <>
+            {/* Search */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
@@ -109,44 +129,71 @@ const InsightsPage = () => {
               />
             </div>
 
-            {grouped.length === 0 ? (
+            {groupedByDay.length === 0 ? (
               <p className="text-center text-muted-foreground py-8">No matches match your search.</p>
             ) : (
-              <div className="space-y-6">
-                {grouped.map(({ date, matches: dayMatches }) => (
-                  <div key={date} className="rounded-lg border border-border overflow-hidden">
-                    <div className="flex items-center gap-2 px-4 py-3 bg-card border-b border-border">
-                      <CalendarDays className="w-4 h-4 text-primary shrink-0" />
-                      <span className="font-semibold text-sm text-foreground flex-1">{formatMatchDate(date)}</span>
-                      <Badge variant="secondary" className="text-xs">
-                        {dayMatches.length} match{dayMatches.length !== 1 ? "es" : ""}
-                      </Badge>
+              <>
+                {/* Day navigation buttons */}
+                <div className="flex flex-wrap gap-2">
+                  {days.map(date => (
+                    <Button
+                      key={date}
+                      variant={activeDay === date ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => scrollToDay(date)}
+                    >
+                      {formatDayLabel(date)}
+                    </Button>
+                  ))}
+                </div>
+
+                {/* Day sections */}
+                <div className="space-y-8">
+                  {groupedByDay.map(({ date, competitions }) => (
+                    <div key={date} id={dayId(date)} className="scroll-mt-20 space-y-4">
+                      {/* Day header */}
+                      <div className="flex items-center gap-3">
+                        <CalendarDays className="w-4 h-4 text-primary shrink-0" />
+                        <h2 className="font-bold text-foreground">{formatDayLabel(date)}</h2>
+                        <span className="text-xs text-muted-foreground">
+                          {competitions.reduce((sum, c) => sum + c.matches.length, 0)} matches
+                        </span>
+                      </div>
+
+                      {/* Competition groups within this day */}
+                      <div className="space-y-3 pl-0">
+                        {competitions.map(({ competition, matches: compMatches }) => (
+                          <div key={competition} className="rounded-lg border border-border overflow-hidden">
+                            <div className="flex items-center gap-2 px-4 py-2 bg-card border-b border-border">
+                              <Trophy className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                              <span className="text-xs font-semibold text-foreground flex-1">{competition}</span>
+                              <Badge variant="secondary" className="text-xs">
+                                {compMatches.length}
+                              </Badge>
+                            </div>
+
+                            <div className="divide-y divide-border">
+                              {compMatches.map((match) => (
+                                <div key={match.id} className="flex items-center gap-4 px-4 py-2.5">
+                                  <div className="flex-1 flex items-center justify-end">
+                                    <span className="text-sm font-semibold text-foreground">{match.homeTeam}</span>
+                                  </div>
+                                  <div className="shrink-0 w-8 text-center">
+                                    <span className="text-xs text-muted-foreground font-medium">vs</span>
+                                  </div>
+                                  <div className="flex-1 flex items-center">
+                                    <span className="text-sm font-semibold text-foreground">{match.awayTeam}</span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-
-                    <div className="divide-y divide-border">
-                      {dayMatches.map((match) => (
-                        <div key={match.id} className="flex items-center gap-4 px-4 py-3">
-                          <div className="w-32 shrink-0">
-                            <span className="text-xs font-medium text-muted-foreground">{match.competition}</span>
-                          </div>
-
-                          <div className="flex-1 flex items-center justify-end">
-                            <span className="text-sm font-semibold text-foreground">{match.homeTeam}</span>
-                          </div>
-
-                          <div className="shrink-0 w-8 text-center">
-                            <span className="text-xs text-muted-foreground font-medium">vs</span>
-                          </div>
-
-                          <div className="flex-1 flex items-center">
-                            <span className="text-sm font-semibold text-foreground">{match.awayTeam}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              </>
             )}
           </>
         )}
