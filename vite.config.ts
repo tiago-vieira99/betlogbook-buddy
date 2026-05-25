@@ -11,6 +11,7 @@ export default defineConfig(({ mode }) => ({
     allowedHosts: true,
     hmr: {
       overlay: false,
+      timeout: 300000,
     },
     proxy: {
       '/api/bhd': {
