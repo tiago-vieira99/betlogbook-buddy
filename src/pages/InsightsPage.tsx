@@ -145,14 +145,19 @@ const InsightsPage = () => {
               ))}
             </div>
           </div>
-          <div className="sm:w-48">
+          <div className="sm:w-64">
             <label className="text-xs text-muted-foreground mb-1 block">From date (dd/mm/yyyy)</label>
-            <Input
-              value={fromDate}
-              onChange={(e) => setFromDate(e.target.value)}
-              placeholder="dd/mm/yyyy"
-            />
+            <div className="flex gap-2">
+              <Input
+                value={pendingDate}
+                onChange={(e) => setPendingDate(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") applyDate(); }}
+                placeholder="dd/mm/yyyy"
+              />
+              <Button size="sm" onClick={applyDate} disabled={loading}>Load</Button>
+            </div>
           </div>
+
         </div>
 
         {loading ? (
