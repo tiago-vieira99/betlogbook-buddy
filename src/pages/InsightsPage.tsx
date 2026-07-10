@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { NavButtons } from "@/components/NavButtons";
 import { toast } from "sonner";
 
-const BET_TYPES = ["BTTS", "Over 2.5", "Under 2.5", "Home Win", "Away Win"];
+const BET_TYPES = ["BTTS"];
 
 function parseMatchDate(d: string): number {
   const [day, month, year] = d.split("/").map(Number);
