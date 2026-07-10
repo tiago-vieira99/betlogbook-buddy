@@ -24,7 +24,7 @@ export function getSeasonForTeam(beginSeason: string): string {
   if (earlyMonths.includes(beginSeason)) {
     return "2026";
   }
-  return "2025-2026";
+  return "2026-2027";
 }
 
 export async function fetchMatches(teamName: string, season: string): Promise<Match[]> {
