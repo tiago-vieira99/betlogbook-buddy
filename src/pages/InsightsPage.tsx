@@ -40,13 +40,14 @@ const InsightsPage = () => {
   const [activeDay, setActiveDay] = useState<string | null>(null);
   const [betType, setBetType] = useState<string>("BTTS");
   const [fromDate, setFromDate] = useState<string>(todayDDMMYYYY());
+  const [pendingDate, setPendingDate] = useState<string>(todayDDMMYYYY());
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const loadPredictions = (type: string, date: string) => {
     setLoading(true);
     setError(null);
     setActiveDay(null);
-    fetchPredictions(betType, fromDate)
+    fetchPredictions(type, date)
       .then(setPredictions)
       .catch((err) => {
         console.error(err);
@@ -54,7 +55,18 @@ const InsightsPage = () => {
         toast.error("Failed to load insights data");
       })
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadPredictions(betType, fromDate);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [betType, fromDate]);
+
+  const applyDate = () => {
+    if (pendingDate !== fromDate) setFromDate(pendingDate);
+    else loadPredictions(betType, pendingDate);
+  };
+
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
