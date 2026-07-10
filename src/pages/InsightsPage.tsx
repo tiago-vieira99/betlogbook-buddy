@@ -208,8 +208,13 @@ const InsightsPage = () => {
                           <Badge variant="secondary" className="text-xs">{matches.length}</Badge>
                         </div>
                         <div className="divide-y divide-border">
-                          {matches.map((match) => (
-                            <div key={match.id} className="flex items-center gap-4 px-4 py-2.5">
+                          {matches.map((match) => {
+                            const highlight = match.confidence >= 0.7;
+                            return (
+                            <div
+                              key={match.id}
+                              className={`flex items-center gap-4 px-4 py-2.5 ${highlight ? "bg-win/15 border-l-2 border-win" : ""}`}
+                            >
                               <div className="flex-1 flex items-center justify-end">
                                 <span className="text-sm font-semibold text-foreground">{match.homeTeam}</span>
                               </div>
@@ -221,7 +226,7 @@ const InsightsPage = () => {
                               </div>
                               <div className="shrink-0 w-16 text-right">
                                 <Badge
-                                  variant="secondary"
+                                  variant={highlight ? "default" : "secondary"}
                                   className="text-xs tabular-nums"
                                   title="Confidence"
                                 >
@@ -229,7 +234,9 @@ const InsightsPage = () => {
                                 </Badge>
                               </div>
                             </div>
-                          ))}
+                            );
+                          })}
+
                         </div>
                       </div>
                     ))}
