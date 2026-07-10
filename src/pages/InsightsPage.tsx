@@ -40,13 +40,14 @@ const InsightsPage = () => {
   const [activeDay, setActiveDay] = useState<string | null>(null);
   const [betType, setBetType] = useState<string>("BTTS");
   const [fromDate, setFromDate] = useState<string>(todayDDMMYYYY());
+  const [pendingDate, setPendingDate] = useState<string>(todayDDMMYYYY());
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const loadPredictions = (type: string, date: string) => {
     setLoading(true);
     setError(null);
     setActiveDay(null);
-    fetchPredictions(betType, fromDate)
+    fetchPredictions(type, date)
       .then(setPredictions)
       .catch((err) => {
         console.error(err);
@@ -54,7 +55,18 @@ const InsightsPage = () => {
         toast.error("Failed to load insights data");
       })
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadPredictions(betType, fromDate);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [betType, fromDate]);
+
+  const applyDate = () => {
+    if (pendingDate !== fromDate) setFromDate(pendingDate);
+    else loadPredictions(betType, pendingDate);
+  };
+
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
@@ -133,14 +145,19 @@ const InsightsPage = () => {
               ))}
             </div>
           </div>
-          <div className="sm:w-48">
+          <div className="sm:w-64">
             <label className="text-xs text-muted-foreground mb-1 block">From date (dd/mm/yyyy)</label>
-            <Input
-              value={fromDate}
-              onChange={(e) => setFromDate(e.target.value)}
-              placeholder="dd/mm/yyyy"
-            />
+            <div className="flex gap-2">
+              <Input
+                value={pendingDate}
+                onChange={(e) => setPendingDate(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") applyDate(); }}
+                placeholder="dd/mm/yyyy"
+              />
+              <Button size="sm" onClick={applyDate} disabled={loading}>Load</Button>
+            </div>
           </div>
+
         </div>
 
         {loading ? (
