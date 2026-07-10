@@ -1,14 +1,10 @@
-export interface UpcomingMatch {
+export interface Prediction {
   id: number;
-  teamId: number | null;
-  created_date: string;
-  updated_date: string;
+  date: string;
   homeTeam: string;
   awayTeam: string;
-  season: string;
-  matchDate: string;
-  ftResult: string;
-  htResult: string;
   competition: string;
-  sport: string;
+  betType: string;
+  url: string | null;
+  confidence: number;
 }
