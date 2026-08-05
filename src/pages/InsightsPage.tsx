@@ -2,12 +2,15 @@ import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchPredictions } from "@/services/insightsApi";
 import { Prediction } from "@/types/insights";
-import { ArrowLeft, Loader2, Search, CalendarDays, Trophy } from "lucide-react";
+import { ArrowLeft, Loader2, Search, CalendarDays, Trophy, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { NavButtons } from "@/components/NavButtons";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { createBet } from "@/services/api";
 
 const BET_TYPES = ["BTTS"];
 
@@ -42,6 +45,46 @@ const InsightsPage = () => {
   const [fromDate, setFromDate] = useState<string>(todayDDMMYYYY());
   const [pendingDate, setPendingDate] = useState<string>(todayDDMMYYYY());
   const navigate = useNavigate();
+
+  // Bet dialog state
+  const [betDialog, setBetDialog] = useState<{ match: Prediction } | null>(null);
+  const [betOdd, setBetOdd] = useState("");
+  const [betStake, setBetStake] = useState("");
+  const [betSubmitting, setBetSubmitting] = useState(false);
+
+  const openBetDialog = (match: Prediction) => {
+    setBetOdd("");
+    setBetStake("");
+    setBetDialog({ match });
+  };
+
+  const submitBet = async () => {
+    if (!betDialog) return;
+    const odd = parseFloat(betOdd);
+    const stake = parseFloat(betStake);
+    if (isNaN(odd) || odd <= 0) { toast.error("Please enter a valid odd"); return; }
+    if (isNaN(stake) || stake <= 0) { toast.error("Please enter a valid stake"); return; }
+    setBetSubmitting(true);
+    const { match } = betDialog;
+    try {
+      await createBet(20, {
+        bankrollID: 20,
+        date: match.date,
+        odd,
+        stake,
+        balance: 0,
+        status: "ONGOING",
+        comment: `${match.homeTeam} vs ${match.awayTeam} | ${match.competition}`,
+      });
+      toast.success("Bet created successfully");
+      setBetDialog(null);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to create bet");
+    } finally {
+      setBetSubmitting(false);
+    }
+  };
 
   const loadPredictions = (type: string, date: string) => {
     setLoading(true);
@@ -233,6 +276,15 @@ const InsightsPage = () => {
                                   {(match.confidence * 100).toFixed(1)}%
                                 </Badge>
                               </div>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="shrink-0 w-6 h-6"
+                                title="Add bet"
+                                onClick={(e) => { e.stopPropagation(); openBetDialog(match); }}
+                              >
+                                <PlusCircle className="w-4 h-4 text-muted-foreground" />
+                              </Button>
                             </div>
                             );
                           })}
@@ -247,6 +299,56 @@ const InsightsPage = () => {
           </>
         )}
       </main>
+
+      {/* Add Bet Dialog */}
+      <Dialog open={!!betDialog} onOpenChange={(open) => { if (!open) setBetDialog(null); }}>
+        <DialogContent className="sm:max-w-xs">
+          <DialogHeader>
+            <DialogTitle className="text-sm">Add Bet</DialogTitle>
+            {betDialog && (
+              <p className="text-xs text-muted-foreground mt-1">
+                {betDialog.match.homeTeam} vs {betDialog.match.awayTeam}
+              </p>
+            )}
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="bet-odd" className="text-xs">Odd</Label>
+              <Input
+                id="bet-odd"
+                type="number"
+                min="1"
+                step="0.01"
+                placeholder="e.g. 1.85"
+                value={betOdd}
+                onChange={(e) => setBetOdd(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") submitBet(); }}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="bet-stake" className="text-xs">Stake</Label>
+              <Input
+                id="bet-stake"
+                type="number"
+                min="0.01"
+                step="0.01"
+                placeholder="e.g. 10"
+                value={betStake}
+                onChange={(e) => setBetStake(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") submitBet(); }}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" size="sm" onClick={() => setBetDialog(null)} disabled={betSubmitting}>
+              Cancel
+            </Button>
+            <Button size="sm" onClick={submitBet} disabled={betSubmitting}>
+              {betSubmitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "OK"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
