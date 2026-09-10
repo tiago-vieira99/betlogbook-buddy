@@ -148,8 +148,8 @@ const InsightsPage = () => {
     const q = search.toLowerCase();
     if (!q) return predictions;
     return predictions.filter(m =>
-      m.homeTeam.toLowerCase().includes(q) ||
-      m.awayTeam.toLowerCase().includes(q) ||
+      teamName(m.homeTeam).toLowerCase().includes(q) ||
+      teamName(m.awayTeam).toLowerCase().includes(q) ||
       m.competition.toLowerCase().includes(q)
     );
   }, [predictions, search]);
