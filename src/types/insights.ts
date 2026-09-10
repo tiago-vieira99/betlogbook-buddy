@@ -4,6 +4,7 @@ export interface Prediction {
   homeTeam: string;
   awayTeam: string;
   competition: string;
+  country?: string;
   betType: string;
   url: string | null;
   confidence: number;
