@@ -294,13 +294,13 @@ const InsightsPage = () => {
                               className={`flex items-center gap-4 px-4 py-2.5 ${highlight ? "bg-win/15 border-l-2 border-win" : ""}`}
                             >
                               <div className="flex-1 flex items-center justify-end">
-                                <span className="text-sm font-semibold text-foreground">{match.homeTeam}</span>
+                                <span className="text-sm font-semibold text-foreground">{teamName(match.homeTeam)}</span>
                               </div>
                               <div className="shrink-0 w-8 text-center">
                                 <span className="text-xs text-muted-foreground font-medium">vs</span>
                               </div>
                               <div className="flex-1 flex items-center">
-                                <span className="text-sm font-semibold text-foreground">{match.awayTeam}</span>
+                                <span className="text-sm font-semibold text-foreground">{teamName(match.awayTeam)}</span>
                               </div>
                               <div className="shrink-0 w-16 text-right">
                                 <Badge
