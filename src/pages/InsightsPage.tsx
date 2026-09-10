@@ -70,9 +70,10 @@ const InsightsPage = () => {
     if (isNaN(stake) || stake <= 0) { toast.error("Please enter a valid stake"); return; }
     setBetSubmitting(true);
     const { match } = betDialog;
+    const bankrollId = BANKROLL_BY_TYPE[betType] ?? 20;
     try {
-      await createBet(20, {
-        bankrollID: 20,
+      await createBet(bankrollId, {
+        bankrollID: bankrollId,
         date: match.date,
         odd,
         stake,
