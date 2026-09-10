@@ -59,11 +59,13 @@ const InsightsPage = () => {
   const [betDialog, setBetDialog] = useState<{ match: Prediction } | null>(null);
   const [betOdd, setBetOdd] = useState("");
   const [betStake, setBetStake] = useState("");
+  const [betDescription, setBetDescription] = useState("");
   const [betSubmitting, setBetSubmitting] = useState(false);
 
   const openBetDialog = (match: Prediction) => {
     setBetOdd("");
     setBetStake("");
+    setBetDescription("");
     setBetDialog({ match });
   };
 
