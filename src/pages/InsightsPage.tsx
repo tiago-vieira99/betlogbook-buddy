@@ -157,7 +157,8 @@ const InsightsPage = () => {
   const groupedByDay = useMemo(() => {
     const dayMap: Record<string, Record<string, { label: string; matches: Prediction[] }>> = {};
     for (const m of filtered) {
-      const label = m.country ? `${m.competition} (${m.country})` : m.competition;
+      const country = matchCountry(m);
+      const label = country ? `${m.competition} (${country})` : m.competition;
       if (!dayMap[m.date]) dayMap[m.date] = {};
       if (!dayMap[m.date][label]) dayMap[m.date][label] = { label, matches: [] };
       dayMap[m.date][label].matches.push(m);
