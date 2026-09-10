@@ -342,7 +342,7 @@ const InsightsPage = () => {
             <DialogTitle className="text-sm">Add Bet</DialogTitle>
             {betDialog && (
               <p className="text-xs text-muted-foreground mt-1">
-                {betDialog.match.homeTeam} vs {betDialog.match.awayTeam}
+                {teamName(betDialog.match.homeTeam)} vs {teamName(betDialog.match.awayTeam)}
               </p>
             )}
           </DialogHeader>
