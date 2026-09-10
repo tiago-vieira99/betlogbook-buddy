@@ -78,6 +78,8 @@ const InsightsPage = () => {
     setBetSubmitting(true);
     const { match } = betDialog;
     const bankrollId = BANKROLL_BY_TYPE[betType] ?? 20;
+    const description = betDescription.trim();
+    const baseComment = `${match.homeTeam} vs ${match.awayTeam} | ${match.competition}`;
     try {
       await createBet(bankrollId, {
         bankrollID: bankrollId,
@@ -86,7 +88,7 @@ const InsightsPage = () => {
         stake,
         balance: 0,
         status: "ONGOING",
-        comment: `${match.homeTeam} vs ${match.awayTeam} | ${match.competition}`,
+        comment: description ? `${baseComment} | ${description}` : baseComment,
       });
       toast.success("Bet created successfully");
       setBetDialog(null);
