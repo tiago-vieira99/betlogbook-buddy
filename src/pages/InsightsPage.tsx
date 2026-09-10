@@ -44,6 +44,25 @@ function todayDDMMYYYY(): string {
   return `${dd}/${mm}/${d.getFullYear()}`;
 }
 
+function teamName(team: { name: string } | string): string {
+  return typeof team === "string" ? team : team.name;
+}
+
+function teamCountry(team: { country?: string } | string): string | undefined {
+  return typeof team === "string" ? undefined : team.country;
+}
+
+function matchCountry(match: Prediction): string | undefined {
+  const home = teamCountry(match.homeTeam);
+  const away = teamCountry(match.awayTeam);
+  if (!home && !away) return match.country;
+  if (home && away) {
+    if (home.toLowerCase() === away.toLowerCase()) return home;
+    return "International";
+  }
+  return home || away || match.country;
+}
+
 const InsightsPage = () => {
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,7 +98,7 @@ const InsightsPage = () => {
     const { match } = betDialog;
     const bankrollId = BANKROLL_BY_TYPE[betType] ?? 20;
     const description = betDescription.trim();
-    const baseComment = `${match.homeTeam} vs ${match.awayTeam} | ${match.competition}`;
+    const baseComment = `${teamName(match.homeTeam)} vs ${teamName(match.awayTeam)} | ${match.competition}`;
     try {
       await createBet(bankrollId, {
         bankrollID: bankrollId,
@@ -129,8 +148,8 @@ const InsightsPage = () => {
     const q = search.toLowerCase();
     if (!q) return predictions;
     return predictions.filter(m =>
-      m.homeTeam.toLowerCase().includes(q) ||
-      m.awayTeam.toLowerCase().includes(q) ||
+      teamName(m.homeTeam).toLowerCase().includes(q) ||
+      teamName(m.awayTeam).toLowerCase().includes(q) ||
       m.competition.toLowerCase().includes(q)
     );
   }, [predictions, search]);
@@ -138,7 +157,8 @@ const InsightsPage = () => {
   const groupedByDay = useMemo(() => {
     const dayMap: Record<string, Record<string, { label: string; matches: Prediction[] }>> = {};
     for (const m of filtered) {
-      const label = m.country ? `${m.competition} (${m.country})` : m.competition;
+      const country = matchCountry(m);
+      const label = country ? `${m.competition} (${country})` : m.competition;
       if (!dayMap[m.date]) dayMap[m.date] = {};
       if (!dayMap[m.date][label]) dayMap[m.date][label] = { label, matches: [] };
       dayMap[m.date][label].matches.push(m);
@@ -274,13 +294,13 @@ const InsightsPage = () => {
                               className={`flex items-center gap-4 px-4 py-2.5 ${highlight ? "bg-win/15 border-l-2 border-win" : ""}`}
                             >
                               <div className="flex-1 flex items-center justify-end">
-                                <span className="text-sm font-semibold text-foreground">{match.homeTeam}</span>
+                                <span className="text-sm font-semibold text-foreground">{teamName(match.homeTeam)}</span>
                               </div>
                               <div className="shrink-0 w-8 text-center">
                                 <span className="text-xs text-muted-foreground font-medium">vs</span>
                               </div>
                               <div className="flex-1 flex items-center">
-                                <span className="text-sm font-semibold text-foreground">{match.awayTeam}</span>
+                                <span className="text-sm font-semibold text-foreground">{teamName(match.awayTeam)}</span>
                               </div>
                               <div className="shrink-0 w-16 text-right">
                                 <Badge
@@ -322,7 +342,7 @@ const InsightsPage = () => {
             <DialogTitle className="text-sm">Add Bet</DialogTitle>
             {betDialog && (
               <p className="text-xs text-muted-foreground mt-1">
-                {betDialog.match.homeTeam} vs {betDialog.match.awayTeam}
+                {teamName(betDialog.match.homeTeam)} vs {teamName(betDialog.match.awayTeam)}
               </p>
             )}
           </DialogHeader>
