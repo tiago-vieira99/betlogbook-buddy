@@ -12,7 +12,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { createBet } from "@/services/api";
 
-const BET_TYPES = ["BTTS"];
+const BET_TYPES = ["BTTS", "1X && Over"];
+const BANKROLL_BY_TYPE: Record<string, number> = {
+  "BTTS": 20,
+  "1X && Over": 21,
+};
 
 function parseMatchDate(d: string): number {
   const [day, month, year] = d.split("/").map(Number);
