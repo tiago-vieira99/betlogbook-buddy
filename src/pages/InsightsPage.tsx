@@ -136,11 +136,12 @@ const InsightsPage = () => {
   }, [predictions, search]);
 
   const groupedByDay = useMemo(() => {
-    const dayMap: Record<string, Record<string, Prediction[]>> = {};
+    const dayMap: Record<string, Record<string, { label: string; matches: Prediction[] }>> = {};
     for (const m of filtered) {
+      const label = m.country ? `${m.competition} (${m.country})` : m.competition;
       if (!dayMap[m.date]) dayMap[m.date] = {};
-      if (!dayMap[m.date][m.competition]) dayMap[m.date][m.competition] = [];
-      dayMap[m.date][m.competition].push(m);
+      if (!dayMap[m.date][label]) dayMap[m.date][label] = { label, matches: [] };
+      dayMap[m.date][label].matches.push(m);
     }
     return Object.keys(dayMap)
       .sort((a, b) => parseMatchDate(a) - parseMatchDate(b))
@@ -148,9 +149,9 @@ const InsightsPage = () => {
         date,
         competitions: Object.keys(dayMap[date])
           .sort((a, b) => a.localeCompare(b))
-          .map(competition => ({
-            competition,
-            matches: dayMap[date][competition].sort((a, b) => b.confidence - a.confidence),
+          .map(label => ({
+            competition: label,
+            matches: dayMap[date][label].matches.sort((a, b) => b.confidence - a.confidence),
           })),
       }));
   }, [filtered]);
