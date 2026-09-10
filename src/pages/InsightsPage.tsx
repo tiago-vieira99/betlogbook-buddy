@@ -18,6 +18,11 @@ const BANKROLL_BY_TYPE: Record<string, number> = {
   "1X && Over": 21,
 };
 
+const HIGHLIGHT_THRESHOLD: Record<string, number> = {
+  "BTTS": 0.7,
+  "1X && Over": 0.45,
+};
+
 function parseMatchDate(d: string): number {
   const [day, month, year] = d.split("/").map(Number);
   if ([day, month, year].some(isNaN)) return 0;
@@ -257,7 +262,7 @@ const InsightsPage = () => {
                         </div>
                         <div className="divide-y divide-border">
                           {matches.map((match) => {
-                            const highlight = match.confidence >= 0.7;
+                            const highlight = match.confidence >= (HIGHLIGHT_THRESHOLD[betType] ?? 0.7);
                             return (
                             <div
                               key={match.id}
