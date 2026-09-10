@@ -98,7 +98,7 @@ const InsightsPage = () => {
     const { match } = betDialog;
     const bankrollId = BANKROLL_BY_TYPE[betType] ?? 20;
     const description = betDescription.trim();
-    const baseComment = `${match.homeTeam} vs ${match.awayTeam} | ${match.competition}`;
+    const baseComment = `${teamName(match.homeTeam)} vs ${teamName(match.awayTeam)} | ${match.competition}`;
     try {
       await createBet(bankrollId, {
         bankrollID: bankrollId,
