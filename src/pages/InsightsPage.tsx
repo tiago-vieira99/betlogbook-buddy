@@ -59,11 +59,13 @@ const InsightsPage = () => {
   const [betDialog, setBetDialog] = useState<{ match: Prediction } | null>(null);
   const [betOdd, setBetOdd] = useState("");
   const [betStake, setBetStake] = useState("");
+  const [betDescription, setBetDescription] = useState("");
   const [betSubmitting, setBetSubmitting] = useState(false);
 
   const openBetDialog = (match: Prediction) => {
     setBetOdd("");
     setBetStake("");
+    setBetDescription("");
     setBetDialog({ match });
   };
 
@@ -76,6 +78,8 @@ const InsightsPage = () => {
     setBetSubmitting(true);
     const { match } = betDialog;
     const bankrollId = BANKROLL_BY_TYPE[betType] ?? 20;
+    const description = betDescription.trim();
+    const baseComment = `${match.homeTeam} vs ${match.awayTeam} | ${match.competition}`;
     try {
       await createBet(bankrollId, {
         bankrollID: bankrollId,
@@ -84,7 +88,7 @@ const InsightsPage = () => {
         stake,
         balance: 0,
         status: "ONGOING",
-        comment: `${match.homeTeam} vs ${match.awayTeam} | ${match.competition}`,
+        comment: description ? `${baseComment} | ${description}` : baseComment,
       });
       toast.success("Bet created successfully");
       setBetDialog(null);
@@ -345,6 +349,16 @@ const InsightsPage = () => {
                 placeholder="e.g. 10"
                 value={betStake}
                 onChange={(e) => setBetStake(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") submitBet(); }}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="bet-description" className="text-xs">Description (optional)</Label>
+              <Input
+                id="bet-description"
+                placeholder="Add a note about this bet..."
+                value={betDescription}
+                onChange={(e) => setBetDescription(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") submitBet(); }}
               />
             </div>
