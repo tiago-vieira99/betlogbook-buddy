@@ -352,6 +352,16 @@ const InsightsPage = () => {
                 onKeyDown={(e) => { if (e.key === "Enter") submitBet(); }}
               />
             </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="bet-description" className="text-xs">Description (optional)</Label>
+              <Input
+                id="bet-description"
+                placeholder="Add a note about this bet..."
+                value={betDescription}
+                onChange={(e) => setBetDescription(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") submitBet(); }}
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" size="sm" onClick={() => setBetDialog(null)} disabled={betSubmitting}>
