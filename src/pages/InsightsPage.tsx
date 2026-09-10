@@ -44,6 +44,25 @@ function todayDDMMYYYY(): string {
   return `${dd}/${mm}/${d.getFullYear()}`;
 }
 
+function teamName(team: { name: string } | string): string {
+  return typeof team === "string" ? team : team.name;
+}
+
+function teamCountry(team: { country?: string } | string): string | undefined {
+  return typeof team === "string" ? undefined : team.country;
+}
+
+function matchCountry(match: Prediction): string | undefined {
+  const home = teamCountry(match.homeTeam);
+  const away = teamCountry(match.awayTeam);
+  if (!home && !away) return match.country;
+  if (home && away) {
+    if (home.toLowerCase() === away.toLowerCase()) return home;
+    return "International";
+  }
+  return home || away || match.country;
+}
+
 const InsightsPage = () => {
   const [predictions, setPredictions] = useState<Prediction[]>([]);
   const [loading, setLoading] = useState(true);
