@@ -55,7 +55,7 @@ const BankrollPage = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
           <p className="text-muted-foreground text-lg">Bankroll not found.</p>
-          <Button variant="outline" onClick={() => navigate("/")}>Go Home</Button>
+          <Button variant="outline" onClick={() => (window.history.state?.idx > 0 ? navigate(-1) : navigate("/"))}>Go Home</Button>
         </div>
       </div>
     );
@@ -67,7 +67,7 @@ const BankrollPage = () => {
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 bg-background border-b border-border">
         <div className="container max-w-6xl mx-auto px-4 py-4 flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0">
+          <Button variant="ghost" size="icon" onClick={() => (window.history.state?.idx > 0 ? navigate(-1) : navigate("/"))} className="shrink-0">
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <img src="/favicon.ico" alt="BetLogger" className="w-9 h-9 rounded-lg shrink-0" />
