@@ -29,7 +29,7 @@ export function getSeasonForTeam(beginSeason: string): string {
 
 export async function fetchMatches(teamName: string, season: string): Promise<Match[]> {
   const params = new URLSearchParams({ teamName, season });
-  const res = await fetch(`${API_BASE_URL}/historic-matches?${params}`, {
+  const res = await fetch(`${API_BASE_URL}/historic-matches-with-next?${params}`, {
     method: "GET",
     headers: getHeaders(),
   });
