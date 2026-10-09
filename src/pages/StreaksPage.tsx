@@ -5,7 +5,9 @@ import { StreakTeam, MarketData } from "@/types/streak";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Loader2, ArrowUpDown, ChevronDown, ChevronUp, ArrowLeftRight, X, CheckCircle2, Bell } from "lucide-react";
+import { ArrowLeft, Loader2, ArrowUpDown, ChevronDown, ChevronUp, ArrowLeftRight, X, CheckCircle2, Bell, ListOrdered } from "lucide-react";
+import { fetchTeams } from "@/services/teamApi";
+import { Team } from "@/types/team";
 import { NavButtons } from "@/components/NavButtons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -184,6 +186,21 @@ const StreaksPage = () => {
   const [expandedTeam, setExpandedTeam] = useState<string | null>(null);
 
   const navigate = useNavigate();
+  const [allTeams, setAllTeams] = useState<Team[]>([]);
+  useEffect(() => {
+    fetchTeams().then(setAllTeams).catch((err) => console.error(err));
+  }, []);
+  const openTeamMatches = (team: StreakTeam) => {
+    const found =
+      allTeams.find((t) => t.id === team.teamID) ||
+      allTeams.find((t) => t.name.trim().toLowerCase() === team.name.trim().toLowerCase());
+    if (!found) {
+      toast.error("Equipa não encontrada");
+      return;
+    }
+    const params = new URLSearchParams({ teamName: found.name, beginSeason: found.beginSeason });
+    navigate(`/teams/${found.id}/matches?${params}`);
+  };
   const location = useLocation();
   const [urlParamsApplied, setUrlParamsApplied] = useState(false);
 
@@ -338,7 +355,20 @@ const StreaksPage = () => {
     const rate = getSuccessRate(md);
     return (
       <TableRow key={team.name}>
-        <TableCell className="font-medium">{team.name}</TableCell>
+        <TableCell className="font-medium">
+          <span className="inline-flex items-center gap-2">
+            {team.name}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              title="Ver jogos"
+              onClick={() => openTeamMatches(team)}
+            >
+              <ListOrdered className="w-3.5 h-3.5 text-primary" />
+            </Button>
+          </span>
+        </TableCell>
         <TableCell>{team.position}</TableCell>
         <TableCell className="font-semibold">{md.currentNegStreak}</TableCell>
         <TableCell>{md.matchesPlayed}</TableCell>
