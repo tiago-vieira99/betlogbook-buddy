@@ -397,7 +397,7 @@ const StreaksPage = () => {
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-50 bg-background border-b border-border">
         <div className="container max-w-5xl mx-auto px-4 py-4 flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
+          <Button variant="ghost" size="icon" onClick={() => (window.history.state?.idx > 0 ? navigate(-1) : navigate("/"))}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex-1">
