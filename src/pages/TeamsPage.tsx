@@ -81,7 +81,7 @@ const TeamsPage = () => {
                         teamName: team.name,
                         beginSeason: team.beginSeason,
                       });
-                      window.open(`/teams/${team.id}/matches?${params}`, "_blank");
+                      navigate(`/teams/${team.id}/matches?${params}`);
                     }}
                   >
                     <TableCell className="font-medium">{team.name}</TableCell>
