@@ -55,7 +55,7 @@ const BankrollPage = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-4">
           <p className="text-muted-foreground text-lg">Bankroll not found.</p>
-          <Button variant="outline" onClick={() => (window.history.state?.idx > 0 ? navigate(-1) : navigate("/"))}>Go Home</Button>
+          <Button variant="outline" onClick={() => navigate("/")}>Go Home</Button>
         </div>
       </div>
     );
