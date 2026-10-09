@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchPredictions } from "@/services/insightsApi";
 import { Prediction } from "@/types/insights";
-import { ArrowLeft, Loader2, Search, CalendarDays, Trophy, PlusCircle } from "lucide-react";
+import { Home, ArrowLeft, Loader2, Search, CalendarDays, Trophy, PlusCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -190,6 +190,9 @@ const InsightsPage = () => {
         <div className="container max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => (window.history.state?.idx > 0 ? navigate(-1) : navigate("/"))}>
             <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")} title="Homepage" className="shrink-0">
+            <Home className="w-5 h-5" />
           </Button>
           <div className="flex-1">
             <h1 className="text-lg font-bold text-foreground tracking-tight">Insights</h1>
