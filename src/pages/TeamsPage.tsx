@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchTeams } from "@/services/teamApi";
 import { Team } from "@/types/team";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { ArrowLeft, Loader2, Search } from "lucide-react";
+import { Home, ArrowLeft, Loader2, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -36,6 +36,9 @@ const TeamsPage = () => {
         <div className="container max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => (window.history.state?.idx > 0 ? navigate(-1) : navigate("/"))}>
             <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")} title="Homepage" className="shrink-0">
+            <Home className="w-5 h-5" />
           </Button>
           <div className="flex-1">
             <h1 className="text-lg font-bold text-foreground tracking-tight">Teams</h1>

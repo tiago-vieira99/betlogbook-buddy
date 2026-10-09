@@ -3,7 +3,7 @@ import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { fetchMatches, getSeasonForTeam } from "@/services/teamApi";
 import { Match } from "@/types/team";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { ArrowLeft, Loader2, ArrowUpDown } from "lucide-react";
+import { Home, ArrowLeft, Loader2, ArrowUpDown } from "lucide-react";
 import { NavButtons } from "@/components/NavButtons";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -75,6 +75,9 @@ const MatchesPage = () => {
         <div className="container max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => (window.history.state?.idx > 0 ? navigate(-1) : navigate("/teams"))}>
             <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")} title="Homepage" className="shrink-0">
+            <Home className="w-5 h-5" />
           </Button>
           <div className="flex-1">
             <h1 className="text-lg font-bold text-foreground tracking-tight">

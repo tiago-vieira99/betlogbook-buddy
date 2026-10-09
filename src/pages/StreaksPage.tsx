@@ -5,7 +5,7 @@ import { StreakTeam, MarketData } from "@/types/streak";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Loader2, ArrowUpDown, ChevronDown, ChevronUp, ArrowLeftRight, X, CheckCircle2, Bell, ListOrdered } from "lucide-react";
+import { Home, ArrowLeft, Loader2, ArrowUpDown, ChevronDown, ChevronUp, ArrowLeftRight, X, CheckCircle2, Bell, ListOrdered } from "lucide-react";
 import { fetchTeams } from "@/services/teamApi";
 import { Team } from "@/types/team";
 import { NavButtons } from "@/components/NavButtons";
@@ -399,6 +399,9 @@ const StreaksPage = () => {
         <div className="container max-w-5xl mx-auto px-4 py-4 flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => (window.history.state?.idx > 0 ? navigate(-1) : navigate("/"))}>
             <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")} title="Homepage" className="shrink-0">
+            <Home className="w-5 h-5" />
           </Button>
           <div className="flex-1">
             <h1 className="text-lg font-bold text-foreground tracking-tight">Streaks</h1>
