@@ -7,6 +7,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Home, ArrowLeft, Loader2, ArrowUpDown, ChevronDown, ChevronUp, ArrowLeftRight, X, CheckCircle2, Bell, ListOrdered } from "lucide-react";
 import { fetchTeams } from "@/services/teamApi";
+import { TeamMatchesDialog } from "@/components/TeamMatchesDialog";
 import { Team } from "@/types/team";
 import { NavButtons } from "@/components/NavButtons";
 import { Button } from "@/components/ui/button";
@@ -190,6 +191,7 @@ const StreaksPage = () => {
   useEffect(() => {
     fetchTeams().then(setAllTeams).catch((err) => console.error(err));
   }, []);
+  const [matchesTeam, setMatchesTeam] = useState<Team | null>(null);
   const openTeamMatches = (team: StreakTeam) => {
     const found =
       allTeams.find((t) => t.id === team.teamID) ||
@@ -198,8 +200,7 @@ const StreaksPage = () => {
       toast.error("Equipa não encontrada");
       return;
     }
-    const params = new URLSearchParams({ teamName: found.name, beginSeason: found.beginSeason });
-    navigate(`/teams/${found.id}/matches?${params}`);
+    setMatchesTeam(found);
   };
   const location = useLocation();
   const [urlParamsApplied, setUrlParamsApplied] = useState(false);
@@ -662,6 +663,7 @@ const StreaksPage = () => {
           </>
         )}
       </main>
+      <TeamMatchesDialog team={matchesTeam} onOpenChange={(o) => !o && setMatchesTeam(null)} />
     </div>
   );
 };
