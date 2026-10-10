@@ -1,73 +1,69 @@
-# Welcome to your Lovable project
+# BetLogger
 
-## Project info
+Website para registar bankrolls e apostas, ver equipas, jogos, streaks e insights.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Arrancar o site com Docker
 
-## How can I edit this code?
+O site corre num container Docker e liga-se às tuas APIs que estão a correr no PC:
+- `localhost:8880` → API principal (bankrolls, apostas, streaks, insights)
+- `localhost:8090` → API de equipas e jogos
 
-There are several ways of editing your application.
+Garante que as duas APIs estão ligadas antes de abrir o site.
 
-**Use Lovable**
+### 1. Construir a imagem (só na primeira vez, ou se mudares o Dockerfile)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+Na pasta do projeto:
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+docker build -t betlogger .
 ```
 
-**Edit a file directly in GitHub**
+### 2. Arrancar o container
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+**Windows / Mac:**
 
-**Use GitHub Codespaces**
+```sh
+docker run -d --name betlogger -p 5173:5173 -v "$(pwd)":/app betlogger
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+**Linux** (precisa do `--add-host` para chegar às APIs no PC):
 
-## What technologies are used for this project?
+```sh
+docker run -d --name betlogger -p 5173:5173 --add-host=host.docker.internal:host-gateway -v "$(pwd)":/app betlogger
+```
 
-This project is built with:
+> No Windows com PowerShell usa `${PWD}` em vez de `$(pwd)`.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+O primeiro arranque demora um pouco (instala dependências e prepara o site).
+Depois abre: **http://localhost:5173**
 
-## How can I deploy this project?
+No iPhone (na mesma rede Wi-Fi): `http://<IP-do-PC>:5173`
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+### 3. Comandos úteis
 
-## Can I connect a custom domain to my Lovable project?
+| O que queres fazer | Comando |
+| --- | --- |
+| Ver se está a correr | `docker ps` |
+| Ver os logs | `docker logs -f betlogger` |
+| Parar | `docker stop betlogger` |
+| Voltar a arrancar | `docker start betlogger` |
+| Aplicar alterações novas do código | `docker restart betlogger` |
+| Apagar o container | `docker rm -f betlogger` |
 
-Yes, you can!
+**Importante:** o site corre em modo normal (não de desenvolvimento), por isso as alterações ao código só aparecem depois de `docker restart betlogger`.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### Modo de desenvolvimento (opcional)
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Se quiseres que o site atualize sozinho a cada alteração ao código (mas com o reload ao voltar ao browser no iPhone):
+
+```sh
+docker run -d --name betlogger-dev -p 5173:5173 -v "$(pwd)":/app betlogger sh -c "npm install && npm run dev -- --host"
+```
+
+## Sem Docker
+
+```sh
+npm install
+npm run build
+npm run preview
+```
