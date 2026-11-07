@@ -6,8 +6,9 @@ import { StatsCards } from "@/components/StatsCards";
 import { AddBetForm } from "@/components/AddBetForm";
 import { BetList } from "@/components/BetList";
 import { BankrollChart } from "@/components/BankrollChart";
+import { VolumeChart } from "@/components/VolumeChart";
 import { BankrollStats } from "@/components/BankrollStats";
-import { Home, ArrowLeft } from "lucide-react";
+import { Home, ArrowLeft, LineChart, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { computeStatsFromBets } from "@/utils/computeStats";
 
