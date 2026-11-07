@@ -138,6 +138,30 @@ const Index = () => {
           </form>
         }
 
+        {bankrolls.length > 0 && (() => {
+          const totalBets = bankrolls.reduce((s, b) => s + (b.numBets || 0), 0);
+          const pnl = bankrolls.reduce((s, b) => s + (b.balance || 0), 0);
+          const invested = bankrolls.reduce((s, b) => s + (b.totalInvested || 0), 0);
+          const winRate = totalBets ? bankrolls.reduce((s, b) => s + (b.greensRate || 0) * (b.numBets || 0), 0) / totalBets : 0;
+          const roi = invested ? (pnl / invested) * 100 : 0;
+          const items = [
+            { label: "Total Bets", value: String(totalBets), cls: "text-foreground" },
+            { label: "Win Rate", value: `${winRate.toFixed(1)}%`, cls: "text-win" },
+            { label: "P&L", value: `${pnl >= 0 ? "+" : ""}€${pnl.toFixed(2)}`, cls: pnl >= 0 ? "text-win" : "text-loss" },
+            { label: "ROI", value: `${roi >= 0 ? "+" : ""}${roi.toFixed(1)}%`, cls: roi >= 0 ? "text-win" : "text-loss" },
+          ];
+          return (
+            <div className="rounded-lg bg-card border border-border p-5 grid grid-cols-2 md:grid-cols-4 gap-4 animate-fade-in">
+              {items.map((i) => (
+                <div key={i.label} className="text-center">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider">{i.label}</p>
+                  <p className={`text-2xl font-bold font-mono ${i.cls}`}>{i.value}</p>
+                </div>
+              ))}
+            </div>
+          );
+        })()}
+
         {bankrolls.length === 0 && !showForm ?
         <div className="rounded-lg bg-card border border-border p-12 text-center animate-fade-in">
             <Wallet className="w-10 h-10 text-muted-foreground mx-auto mb-3" />

@@ -15,26 +15,24 @@ function parseDateToISO(dateStr: string): string {
 export function VolumeChart({ bets }: VolumeChartProps) {
   const data = useMemo(() => {
     const byMonth = new Map<string, number>();
-    bets
-      .filter((b) => b.status !== "ONGOING")
-      .forEach((b) => {
-        const month = parseDateToISO(b.date).slice(0, 7);
-        byMonth.set(month, (byMonth.get(month) || 0) + b.stake);
-      });
+    bets.forEach((b) => {
+      const month = parseDateToISO(b.date).slice(0, 7);
+      byMonth.set(month, (byMonth.get(month) || 0) + 1);
+    });
 
     return Array.from(byMonth.entries())
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([month, volume]) => ({
         month,
         label: new Date(month + "-01").toLocaleDateString("en-US", { month: "short", year: "2-digit" }),
-        volume: parseFloat(volume.toFixed(2)),
+        volume,
       }));
   }, [bets]);
 
   if (data.length === 0) {
     return (
       <div className="rounded-lg bg-card border border-border p-8 text-center">
-        <p className="text-muted-foreground text-sm">Add at least 1 settled bet to see your monthly volume chart.</p>
+        <p className="text-muted-foreground text-sm">Add at least 1 bet to see your monthly volume chart.</p>
       </div>
     );
   }
@@ -56,7 +54,7 @@ export function VolumeChart({ bets }: VolumeChartProps) {
               tickLine={false}
               axisLine={false}
               domain={[0, Math.ceil(maxVolume * 1.1)]}
-              tickFormatter={(v) => `€${v}`}
+              allowDecimals={false}
             />
             <Tooltip
               cursor={{ fill: "hsl(220, 14%, 18%)", opacity: 0.4 }}
@@ -67,7 +65,7 @@ export function VolumeChart({ bets }: VolumeChartProps) {
                 color: "hsl(210, 20%, 92%)",
                 fontSize: 13,
               }}
-              formatter={(value: number) => [`€${value.toFixed(2)}`, "Staked"]}
+              formatter={(value: number) => [value, "Bets"]}
               labelFormatter={(_, payload) => {
                 const month = payload?.[0]?.payload?.month;
                 return month
