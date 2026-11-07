@@ -6,8 +6,9 @@ import { StatsCards } from "@/components/StatsCards";
 import { AddBetForm } from "@/components/AddBetForm";
 import { BetList } from "@/components/BetList";
 import { BankrollChart } from "@/components/BankrollChart";
+import { VolumeChart } from "@/components/VolumeChart";
 import { BankrollStats } from "@/components/BankrollStats";
-import { Home, ArrowLeft } from "lucide-react";
+import { Home, ArrowLeft, LineChart, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { computeStatsFromBets } from "@/utils/computeStats";
 
@@ -19,6 +20,7 @@ const BankrollPage = () => {
   const bankroll = getBankroll(bankrollId);
   const { bets, addBet, updateBet, deleteBet } = useBets(bankrollId);
   const [selectedMonth, setSelectedMonth] = useState("all");
+  const [chartView, setChartView] = useState<"bankroll" | "volume">("bankroll");
 
   const handleAddBet = async (bet: Parameters<typeof addBet>[0]) => {
     await addBet(bet);
@@ -86,7 +88,35 @@ const BankrollPage = () => {
       <main className="container max-w-6xl mx-auto px-4 py-6 space-y-6">
         <StatsCards bankroll={filteredStats} ongoing={filteredOngoing} />
         <BankrollStats bankroll={filteredStats} />
-        <BankrollChart bets={bets} initialBank={bankroll.initialValue} selectedMonth={selectedMonth} onMonthChange={setSelectedMonth} />
+        <div className="space-y-3">
+          <div className="flex justify-end">
+            <div className="inline-flex rounded-lg border border-border bg-card p-1 gap-1">
+              <Button
+                variant={chartView === "bankroll" ? "secondary" : "ghost"}
+                size="sm"
+                className="h-7 px-3 text-xs gap-1.5"
+                onClick={() => setChartView("bankroll")}
+              >
+                <LineChart className="w-3.5 h-3.5" />
+                Bankroll
+              </Button>
+              <Button
+                variant={chartView === "volume" ? "secondary" : "ghost"}
+                size="sm"
+                className="h-7 px-3 text-xs gap-1.5"
+                onClick={() => setChartView("volume")}
+              >
+                <BarChart3 className="w-3.5 h-3.5" />
+                Volume
+              </Button>
+            </div>
+          </div>
+          {chartView === "bankroll" ? (
+            <BankrollChart bets={bets} initialBank={bankroll.initialValue} selectedMonth={selectedMonth} onMonthChange={setSelectedMonth} />
+          ) : (
+            <VolumeChart bets={bets} />
+          )}
+        </div>
 
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-foreground">Bets</h2>
