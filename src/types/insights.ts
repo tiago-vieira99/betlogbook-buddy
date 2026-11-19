@@ -13,4 +13,5 @@ export interface Prediction {
   betType: string;
   url: string | null;
   confidence: number;
+  description?: string;
 }

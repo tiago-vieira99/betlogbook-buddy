@@ -12,15 +12,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { createBet } from "@/services/api";
 
-const BET_TYPES = ["BTTS", "1X && Over"];
-const BANKROLL_BY_TYPE: Record<string, number> = {
+export const BET_TYPES = ["BTTS", "1X && Over", "MyStreaks"];
+export const BANKROLL_BY_TYPE: Record<string, number> = {
   "BTTS": 20,
   "1X && Over": 21,
+  "MyStreaks": 23,
 };
 
-const HIGHLIGHT_THRESHOLD: Record<string, number> = {
+export const HIGHLIGHT_THRESHOLD: Record<string, number> = {
   "BTTS": 0.7,
   "1X && Over": 0.45,
+  "MyStreaks": 0.7,
 };
 
 function parseMatchDate(d: string): number {
@@ -292,38 +294,45 @@ const InsightsPage = () => {
                           {matches.map((match) => {
                             const highlight = match.confidence >= (HIGHLIGHT_THRESHOLD[betType] ?? 0.7);
                             return (
-                            <div
-                              key={match.id}
-                              className={`flex items-center gap-4 px-4 py-2.5 ${highlight ? "bg-win/15 border-l-2 border-win" : ""}`}
-                            >
-                              <div className="flex-1 flex items-center justify-end">
-                                <span className="text-sm font-semibold text-foreground">{teamName(match.homeTeam)}</span>
-                              </div>
-                              <div className="shrink-0 w-8 text-center">
-                                <span className="text-xs text-muted-foreground font-medium">vs</span>
-                              </div>
-                              <div className="flex-1 flex items-center">
-                                <span className="text-sm font-semibold text-foreground">{teamName(match.awayTeam)}</span>
-                              </div>
-                              <div className="shrink-0 w-16 text-right">
-                                <Badge
-                                  variant={highlight ? "default" : "secondary"}
-                                  className="text-xs tabular-nums"
-                                  title="Confidence"
-                                >
-                                  {(match.confidence * 100).toFixed(1)}%
-                                </Badge>
-                              </div>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="shrink-0 w-6 h-6"
-                                title="Add bet"
-                                onClick={(e) => { e.stopPropagation(); openBetDialog(match); }}
+                              <div
+                                key={match.id}
+                                className={highlight ? "bg-win/15 border-l-2 border-win" : ""}
                               >
-                                <PlusCircle className="w-4 h-4 text-muted-foreground" />
-                              </Button>
-                            </div>
+                                <div className="flex items-center gap-4 px-4 py-2.5">
+                                  <div className="flex-1 flex items-center justify-end">
+                                    <span className="text-sm font-semibold text-foreground">{teamName(match.homeTeam)}</span>
+                                  </div>
+                                  <div className="shrink-0 w-8 text-center">
+                                    <span className="text-xs text-muted-foreground font-medium">vs</span>
+                                  </div>
+                                  <div className="flex-1 flex items-center">
+                                    <span className="text-sm font-semibold text-foreground">{teamName(match.awayTeam)}</span>
+                                  </div>
+                                  <div className="shrink-0 w-16 text-right">
+                                    <Badge
+                                      variant={highlight ? "default" : "secondary"}
+                                      className="text-xs tabular-nums"
+                                      title="Confidence"
+                                    >
+                                      {(match.confidence * 100).toFixed(1)}%
+                                    </Badge>
+                                  </div>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="shrink-0 w-6 h-6"
+                                    title="Add bet"
+                                    onClick={(e) => { e.stopPropagation(); openBetDialog(match); }}
+                                  >
+                                    <PlusCircle className="w-4 h-4 text-muted-foreground" />
+                                  </Button>
+                                </div>
+                                {betType === "MyStreaks" && match.description && (
+                                  <p className="px-4 pb-3 text-xs leading-relaxed text-muted-foreground">
+                                    {match.description}
+                                  </p>
+                                )}
+                              </div>
                             );
                           })}
 
