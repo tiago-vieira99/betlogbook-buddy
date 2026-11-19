@@ -5,7 +5,7 @@ import { StreakTeam, MarketData } from "@/types/streak";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Home, ArrowLeft, Loader2, ArrowUpDown, ChevronDown, ChevronUp, ArrowLeftRight, X, CheckCircle2, Bell, ListOrdered } from "lucide-react";
+import { Home, ArrowLeft, Loader2, ArrowUpDown, ChevronDown, ChevronUp, ArrowLeftRight, X, CheckCircle2, Bell, ListOrdered, Filter } from "lucide-react";
 import { fetchTeams } from "@/services/teamApi";
 import { TeamMatchesDialog } from "@/components/TeamMatchesDialog";
 import { Team } from "@/types/team";
@@ -13,6 +13,7 @@ import { NavButtons } from "@/components/NavButtons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { NumFilter, EMPTY_FILTER, matchesFilter, hasFilter } from "@/utils/streakFilters";
 
 type Mode = "normal" | "compare" | "alerts";
 type SortKey = "name" | "position" | "currentNegStreak" | "matchesPlayed" | "currentSeasonSequence" | "totalGreens" | "successRate";
@@ -37,6 +38,17 @@ function getSuccessRate(md: MarketData): number {
 
 function isHighlighted(md: MarketData): boolean {
   return md.currentNegStreak >= getMaxNegSeq(md) && md.currentNegStreak > 0;
+}
+
+// ── Numeric range filters (position / current neg streak) ─────────────────────
+
+function bestSuccessRate(team: StreakTeam, marketKeys: string[]): number {
+  let best = 0;
+  for (const m of marketKeys) {
+    const md = getMarketData(team, m);
+    if (md) best = Math.max(best, getSuccessRate(md));
+  }
+  return best;
 }
 
 function formatcurrentSeasonSequence(seq: number[]): string {
@@ -133,6 +145,9 @@ function TeamSearchInput({
 // ── Alert team expanded detail ─────────────────────────────────────────────────
 
 function AlertTeamDetail({ team, alertingMarkets }: { team: StreakTeam; alertingMarkets: string[] }) {
+  const sortedMarkets = [...alertingMarkets].sort(
+    (a, b) => getSuccessRate(getMarketData(team, b)!) - getSuccessRate(getMarketData(team, a)!)
+  );
   return (
     <div className="px-4 pb-4 pt-1">
       <div className="rounded-md border border-border overflow-x-auto">
@@ -147,7 +162,7 @@ function AlertTeamDetail({ team, alertingMarkets }: { team: StreakTeam; alerting
             </TableRow>
           </TableHeader>
           <TableBody>
-            {alertingMarkets.map(market => {
+            {sortedMarkets.map(market => {
               const md = getMarketData(team, market)!;
               return (
                 <TableRow key={market} className="bg-win/5">
@@ -170,6 +185,88 @@ function AlertTeamDetail({ team, alertingMarkets }: { team: StreakTeam; alerting
   );
 }
 
+// ── Filter bar (position / current neg streak) ────────────────────────────────
+
+function NumberRangeInput({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: NumFilter;
+  onChange: (v: NumFilter) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-1">
+      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{label}</p>
+      <div className="flex items-center gap-1.5">
+        <Input
+          type="number"
+          inputMode="numeric"
+          placeholder="min"
+          value={value.min}
+          onChange={(e) => onChange({ ...value, min: e.target.value })}
+          className="h-8 w-[72px] text-sm"
+        />
+        <span className="text-xs text-muted-foreground">–</span>
+        <Input
+          type="number"
+          inputMode="numeric"
+          placeholder="max"
+          value={value.max}
+          onChange={(e) => onChange({ ...value, max: e.target.value })}
+          className="h-8 w-[72px] text-sm"
+        />
+      </div>
+    </div>
+  );
+}
+
+function FilterBar({
+  position,
+  onPosition,
+  streak,
+  onStreak,
+  onClear,
+  resultCount,
+  totalCount,
+}: {
+  position: NumFilter;
+  onPosition: (v: NumFilter) => void;
+  streak: NumFilter;
+  onStreak: (v: NumFilter) => void;
+  onClear: () => void;
+  resultCount: number;
+  totalCount?: number;
+}) {
+  const active = hasFilter(position) || hasFilter(streak);
+  return (
+    <div className="rounded-lg border border-border bg-card p-3 flex flex-wrap items-end gap-x-5 gap-y-3">
+      <div className="flex items-center gap-2 pb-1.5">
+        <Filter className="w-4 h-4 text-muted-foreground" />
+        <span className="text-sm font-semibold text-foreground">Filters</span>
+      </div>
+      <NumberRangeInput label="Position" value={position} onChange={onPosition} />
+      <NumberRangeInput label="Current Neg Streak" value={streak} onChange={onStreak} />
+      {active && (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 gap-1.5 text-muted-foreground"
+          onClick={onClear}
+        >
+          <X className="w-3.5 h-3.5" />
+          Clear
+        </Button>
+      )}
+      <span className="ml-auto pb-1.5 text-xs text-muted-foreground">
+        {resultCount} team{resultCount !== 1 ? "s" : ""}
+        {totalCount !== undefined ? ` of ${totalCount}` : ""}
+      </span>
+    </div>
+  );
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 const StreaksPage = () => {
@@ -180,6 +277,13 @@ const StreaksPage = () => {
   const [sortKey, setSortKey] = useState<SortKey>("successRate");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [showAll, setShowAll] = useState(false);
+
+  const [positionFilter, setPositionFilter] = useState<NumFilter>(EMPTY_FILTER);
+  const [streakFilter, setStreakFilter] = useState<NumFilter>(EMPTY_FILTER);
+  const clearFilters = () => {
+    setPositionFilter(EMPTY_FILTER);
+    setStreakFilter(EMPTY_FILTER);
+  };
 
   const [mode, setMode] = useState<Mode>("normal");
   const [team1, setTeam1] = useState<StreakTeam | null>(null);
@@ -271,9 +375,18 @@ const StreaksPage = () => {
     }
   };
 
+  const totalMarketTeams = useMemo(
+    () => teams.filter(t => getMarketData(t, selectedMarket) !== null).length,
+    [teams, selectedMarket]
+  );
+
   const sortedTeams = useMemo(() => {
     if (!selectedMarket) return teams;
-    const filtered = teams.filter(t => getMarketData(t, selectedMarket) !== null);
+    const filtered = teams.filter(t => {
+      const md = getMarketData(t, selectedMarket);
+      if (!md) return false;
+      return matchesFilter(t.position, positionFilter) && matchesFilter(md.currentNegStreak, streakFilter);
+    });
     return [...filtered].sort((a, b) => {
       const mdA = getMarketData(a, selectedMarket);
       const mdB = getMarketData(b, selectedMarket);
@@ -290,7 +403,7 @@ const StreaksPage = () => {
       }
       return sortDir === "asc" ? cmp : -cmp;
     });
-  }, [teams, selectedMarket, sortKey, sortDir]);
+  }, [teams, selectedMarket, sortKey, sortDir, positionFilter, streakFilter]);
 
   const { highlighted, rest } = useMemo(() => {
     const h: typeof sortedTeams = [];
@@ -306,13 +419,27 @@ const StreaksPage = () => {
   // compare: markets sorted — both alert first, then one, then neither
   const comparedMarkets = useMemo(() => {
     if (mode !== "compare" || (!team1 && !team2)) return markets;
-    return [...markets].sort((a, b) => {
-      const h1a = team1 ? (getMarketData(team1, a) ? isHighlighted(getMarketData(team1, a)!) : false) : false;
-      const h2a = team2 ? (getMarketData(team2, a) ? isHighlighted(getMarketData(team2, a)!) : false) : false;
-      const h1b = team1 ? (getMarketData(team1, b) ? isHighlighted(getMarketData(team1, b)!) : false) : false;
-      const h2b = team2 ? (getMarketData(team2, b) ? isHighlighted(getMarketData(team2, b)!) : false) : false;
-      return ((h1b ? 1 : 0) + (h2b ? 1 : 0)) - ((h1a ? 1 : 0) + (h2a ? 1 : 0));
-    });
+    const alertCount = (market: string) => {
+      let n = 0;
+      for (const t of [team1, team2]) {
+        if (!t) continue;
+        const md = getMarketData(t, market);
+        if (md && isHighlighted(md)) n++;
+      }
+      return n;
+    };
+    const rateFor = (market: string) => {
+      let best = 0;
+      for (const t of [team1, team2]) {
+        if (!t) continue;
+        const md = getMarketData(t, market);
+        if (md) best = Math.max(best, getSuccessRate(md));
+      }
+      return best;
+    };
+    return [...markets].sort(
+      (a, b) => alertCount(b) - alertCount(a) || rateFor(b) - rateFor(a)
+    );
   }, [mode, team1, team2, markets]);
 
   const team1AlertCount = useMemo(
@@ -327,16 +454,22 @@ const StreaksPage = () => {
   // alerts: all teams that have at least 1 alerting market
   const alertTeams = useMemo(() => {
     return teams
+      .filter(team => matchesFilter(team.position, positionFilter))
       .map(team => {
         const alertingMarkets = markets.filter(m => {
           const md = getMarketData(team, m);
-          return md && isHighlighted(md);
+          return md && isHighlighted(md) && matchesFilter(md.currentNegStreak, streakFilter);
         });
-        return { team, alertingMarkets, count: alertingMarkets.length };
+        return {
+          team,
+          alertingMarkets,
+          count: alertingMarkets.length,
+          bestRate: bestSuccessRate(team, alertingMarkets),
+        };
       })
       .filter(({ count }) => count > 0)
-      .sort((a, b) => b.count - a.count);
-  }, [teams, markets]);
+      .sort((a, b) => b.bestRate - a.bestRate || b.count - a.count);
+  }, [teams, markets, positionFilter, streakFilter]);
 
   const SortableHead = ({ label, sortKeyValue }: { label: string; sortKeyValue: SortKey }) => (
     <TableHead
@@ -450,6 +583,14 @@ const StreaksPage = () => {
         ) : mode === "alerts" ? (
           // ── Alerts mode ──────────────────────────────────────────────────────
           <div className="space-y-3">
+            <FilterBar
+              position={positionFilter}
+              onPosition={setPositionFilter}
+              streak={streakFilter}
+              onStreak={setStreakFilter}
+              onClear={clearFilters}
+              resultCount={alertTeams.length}
+            />
             <div className="flex items-center justify-between">
               <p className="text-sm text-muted-foreground">
                 {alertTeams.length === 0
@@ -636,11 +777,28 @@ const StreaksPage = () => {
               </TabsList>
             </Tabs>
 
+            <FilterBar
+              position={positionFilter}
+              onPosition={setPositionFilter}
+              streak={streakFilter}
+              onStreak={setStreakFilter}
+              onClear={clearFilters}
+              resultCount={highlighted.length + rest.length}
+              totalCount={totalMarketTeams}
+            />
+
             <Table>
               {tableHeader}
               <TableBody>
                 {highlighted.map(renderRow)}
                 {showAll && rest.map(renderRow)}
+                {highlighted.length === 0 && (showAll || rest.length === 0) && (
+                  <TableRow>
+                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                      No teams match the current filters.
+                    </TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
 
