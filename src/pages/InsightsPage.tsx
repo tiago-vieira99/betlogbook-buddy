@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { createBet } from "@/services/api";
+import { dedupeMatches } from "@/utils/insightsDedup";
 
 export const BET_TYPES = ["BTTS", "1X && Over"];
 export const BANKROLL_BY_TYPE: Record<string, number> = {
@@ -144,15 +145,17 @@ const InsightsPage = () => {
   };
 
 
+  const unique = useMemo(() => dedupeMatches(predictions), [predictions]);
+
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    if (!q) return predictions;
-    return predictions.filter(m =>
+    if (!q) return unique;
+    return unique.filter(m =>
       teamName(m.homeTeam).toLowerCase().includes(q) ||
       teamName(m.awayTeam).toLowerCase().includes(q) ||
       m.competition.toLowerCase().includes(q)
     );
-  }, [predictions, search]);
+  }, [unique, search]);
 
   const groupedByDay = useMemo(() => {
     const dayMap: Record<string, Record<string, { label: string; matches: Prediction[] }>> = {};
