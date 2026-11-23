@@ -12,17 +12,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { createBet } from "@/services/api";
 
-export const BET_TYPES = ["BTTS", "1X && Over", "MyStreaks"];
+export const BET_TYPES = ["BTTS", "1X && Over"];
 export const BANKROLL_BY_TYPE: Record<string, number> = {
   "BTTS": 20,
   "1X && Over": 21,
-  "MyStreaks": 23,
 };
 
 export const HIGHLIGHT_THRESHOLD: Record<string, number> = {
   "BTTS": 0.7,
   "1X && Over": 0.45,
-  "MyStreaks": 0.7,
 };
 
 function parseMatchDate(d: string): number {
@@ -327,11 +325,6 @@ const InsightsPage = () => {
                                     <PlusCircle className="w-4 h-4 text-muted-foreground" />
                                   </Button>
                                 </div>
-                                {betType === "MyStreaks" && match.description && (
-                                  <p className="px-4 pb-3 text-xs leading-relaxed text-muted-foreground">
-                                    {match.description}
-                                  </p>
-                                )}
                               </div>
                             );
                           })}
