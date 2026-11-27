@@ -13,15 +13,13 @@ import { Label } from "@/components/ui/label";
 import { createBet } from "@/services/api";
 import { dedupeMatches } from "@/utils/insightsDedup";
 
-export const BET_TYPES = ["BTTS", "1X && Over"];
+export const BET_TYPES = ["BTTS"];
 export const BANKROLL_BY_TYPE: Record<string, number> = {
   "BTTS": 20,
-  "1X && Over": 21,
 };
 
 export const HIGHLIGHT_THRESHOLD: Record<string, number> = {
   "BTTS": 0.7,
-  "1X && Over": 0.45,
 };
 
 function parseMatchDate(d: string): number {
